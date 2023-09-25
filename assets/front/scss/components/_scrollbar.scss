@@ -1,0 +1,17 @@
+.scrollbar {
+    &::-webkit-scrollbar {
+        @apply w-1.5;
+    }
+
+    &::-webkit-scrollbar-track {
+        @apply rounded-r-lg bg-white;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        @apply shadow-sm bg-black-light rounded-full;
+    }
+
+    &::-webkit-scrollbar-thumb:window-inactive {
+        @apply bg-opacity-80;
+    }
+}

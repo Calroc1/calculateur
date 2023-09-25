@@ -1,0 +1,166 @@
+{% extends 'front/base.html.twig' %}
+
+{% import 'front/macros/list.html.twig' as LIST %}
+
+{% block title %}Tableau de bord{% endblock %}
+
+{% block javascripts %}
+	<script>
+		window.organisms = {{ organisms|serialize('stats')|raw }};
+		window.allSteps = {{ getEnabledSupports()|serialize('support:view')|raw }}
+        window.campaigns = {{ campaigns|serialize('stats')|raw }};
+        window.campaignsURL = {{ app.request.get('campaigns')|json_encode|raw }};
+        window.statuses = {{ getCampaignStatuses()|json_encode|raw }};
+	</script>
+	{{ parent() }}
+{% endblock %}
+
+{% block body %}
+	<section class="col-span-full w-full xl:mb-6 mt-6 xl:mt-14">
+		<div class="flex flex-col items-end lg:flex-row lg:justify-between">
+			<div class="text-3xl ">
+				<h1 class="font-bold leading-extra-loose w-full">Mon tableau de bord</h1>
+				<p class=" font-medium leading-none italic">
+					<span>Bonjour</span>
+					<span class="font-bold uppercase">{{ app.user }},</span>
+				</p>
+			</div>
+			<div class="flex flex-col items-end 2xl:flex-row 2xl:justify-end">
+{#				<p class="2xl:mr-9 text-grey-dark italic text-xl leading-none whitespace-nowrap">#}
+{#					Vous pouvez lancer encore#}
+{#					<span class="text-black font-bold">{{ app.user.organism.tokens }} campagne{% if app.user.organism.eldest.tokens > 1%}s{% endif %}</span>#}
+{#				</p>#}				
+				<div class="flex flex-row transform 2xl:translate-y-3 mt-4 2xl:mt-0">
+					{% if is_granted('campaign_add', app.user) %}
+						<a href="{{ path('front_campaign_add') }}" class="btn btn--secondary m-0">Créer une campagne</a>
+					{% endif %}
+					{# <a href="" class="btn btn--secondary my-0">Partager la saisie</a> #}
+				</div>				
+			</div>
+		</div>
+	</section>
+	<section class="col-span-full xl:col-span-8">
+		<h2 class="ml-6 mb-6">Dernières campagnes</h2>
+		{% if latestCampaigns|length > 0 %}					
+			<div class="list list__home mb-10">			
+				{% set types = ['truncatedName', 'dateEnd', 'statusTranslated'] %}
+				{% set options = {
+						'graph': {
+							'path' : 'front_campaign_update',
+							'right' : 'campaign_update',
+							'parameters' : {
+								'step' : 'bilan'
+							}
+						},
+						'edit': {
+							'path' : 'front_campaign_update',
+							'right' : 'campaign_update',
+						}
+					} %}
+				{% set filters = {'dateEnd': 'date', 'statusTranslated': 'statut'} %}
+				{{ LIST.createList(latestCampaigns, types, options, 'state', filters) }}			
+			</div>		
+		{% endif %}
+		<div class="grid grid-cols-6 md:grid-cols-12 gap-x-8 gap-y-8 mb-10">
+			<div class="box-shadow bg-white col-span-6 lg:col-span-3 rounded-lg flex flex-col flex-nowrap items-center text-center leading-none px-3 py-4">
+				<div class="text-primary font-medium text-11xl mr-2.5 tracking-tighter">
+					{{ campaignStatuses['STARTED'] }}
+				</div>
+				<div class="mt-1">
+					<div class="font-bold item--STARTED">
+						{% if campaignStatuses['STARTED'] > 1 %}
+							Estimations en cours
+						{% else %}
+							Estimation en cours
+						{% endif %}
+					</div>
+					{#<span class="text-2xs">sur l'année {{ "now"|date('Y') }}</span>#}
+				</div>
+			</div>
+			<div class="box-shadow bg-white col-span-6 lg:col-span-3 rounded-lg flex flex-col flex-nowrap items-center text-center leading-none px-3 py-4">
+				<div class="text-primary font-medium text-11xl mr-2.5 tracking-tighter">
+					{{ campaignStatuses['COMPLETED'] }}
+				</div>
+				<div class="mt-1">
+					<div class="font-bold item--COMPLETED">
+						{% if campaignStatuses['COMPLETED'] > 1 %}
+							Estimations terminées
+						{% else %}
+							Estimation terminée
+						{% endif %}
+					</div>
+					{#<span class="text-2xs">sur l'année {{ "now"|date('Y') }}</span>#}
+				</div>
+			</div>
+			<div class="box-shadow bg-white col-span-6 lg:col-span-3 rounded-lg flex flex-col flex-nowrap items-center text-center leading-none px-3 py-4">
+				<div class="text-primary font-medium text-11xl mr-2.5 tracking-tighter">
+					{{ campaignStatuses['FINISHED'] }}
+				</div>
+				<div class="mt-1">
+					<div class="font-bold item--FINISHED">
+						Post-campagne
+					</div>
+					{#<span class="text-2xs">sur l'année {{ "now"|date('Y') }}</span>#}
+				</div>
+			</div>			
+			<div class="box-shadow bg-white col-span-6 lg:col-span-3 rounded-lg flex flex-col flex-nowrap items-center text-center leading-none px-3 py-4">
+				<div class="text-primary font-medium text-11xl mr-2.5 tracking-tighter">
+					{{ campaignStatuses['ARCHIVED'] }}
+				</div>
+				<div class="mt-1">
+					<div class="font-bold item--ARCHIVED">
+						{% if campaignStatuses['ARCHIVED'] > 1 %}
+							Campagnes archivées
+						{% else %}
+							Campagne archivée
+						{% endif %}
+					</div>
+					{#<span class="text-2xs">sur l'année {{ "now"|date('Y') }}</span>#}
+				</div>
+			</div>
+		</div>
+	</section>
+	<section class="col-span-full xl:col-span-4 mb-10">
+		<h2 class="ml-6 mb-6">Événements</h2>
+		<div x-data="{campaigns: [], currentDate: ''}" class="box-shadow w-full bg-white rounded-lg">
+			<div @click.stop>
+				<div id="datepicker" class="pb-5" @set-campaigns="campaigns = $event.detail.campaigns; currentDate = $event.detail.date"></div>
+			</div>
+			<template x-if="currentDate">
+				<div @click.stop>
+					<div class="h-px bg-grey-light mx-4 mt-2"></div>
+					<div class="calendar__campaigns rounded-bl-lg overflow-hidden flex">
+						<template x-if="campaigns.length">
+							<div class="scrollbar overflow-y-auto w-full relative">
+								<p x-text="currentDate" class="bg-white text-xs font-medium px-6 capitalize py-4"></p>
+								<ul class="notifs notifs__calendar">
+									<template x-for="(campaign, id) in campaigns" :key="id">
+										<li :class="'notif--' + campaign.status" class="notif flex justify-between items-center relative w-full pl-8 pr-5 py-1 mb-4">
+											<div class="flex flex-col w-full">
+												<p class="text-black text-sm font-normal leading-4 pr-6">Campagne
+													<span x-text="campaign.name"></span>
+													-
+													<span x-text="campaign.dateEnd.split('T')[0]" class="whitespace-nowrap"></span>
+												</p>
+												<p class="text-2xs font-medium" x-text="campaign.statusTranslated"></p>
+											</div>
+											<span></span>
+											<a :href="Routing.generate('front_campaign_update', {campaign: campaign.id, 'step' : 'bilan'})" class="notif__option relative flex items-center pl-4 h-10 text-grey-light hover:text-secondary">
+												{{includeSVG('btn-graph.svg')}}
+											</a>
+										</li>
+									</template>
+								</ul>
+							</div>
+						</template>
+						<template x-if="!campaigns.length">
+							<p class="w-full py-3 px-4 text-xs text-center">Aucune campagne ne correspond à cette date</p>
+						</template>
+					</div>
+				</div>
+			</template>
+		</div>
+	</section>
+	{% include 'front/_stats_home.html.twig' %}
+	{% include 'front/dashboard/_export.html.twig' %}
+{% endblock %}

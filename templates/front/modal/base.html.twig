@@ -1,0 +1,9 @@
+<div class="w-full p-3">
+    <div class="font-black text-center mb-5">
+        <h2>{{ title }}</h2>
+    </div>
+    {% block body %}{% endblock %}   
+    {% for message in app.flashes('modal_success') %}
+        {{ showNotification(message, 'success') }}
+    {% endfor %} 
+</div>

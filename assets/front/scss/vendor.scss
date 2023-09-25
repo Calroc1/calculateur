@@ -1,0 +1,191 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap");
+@import "./custom/litepicker";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        font-family: Roboto, Arial, sans-serif;
+        @apply p-0 m-0 text-sm font-normal text-black bg-white-light;
+    }
+    h1 {
+    }
+    h2 {
+        @apply text-3xl font-light;
+    }
+    h3 {
+        @apply text-lg font-black;
+    }
+    h4 {
+        @apply text-sm font-medium;
+    }
+    //LOADER
+    .loading{
+        pointer-events: none;
+        cursor: auto;
+    }
+    .loader{
+        @apply absolute flex justify-center items-center top-0 left-0 w-full h-full rounded-lg z-10;
+        &::before{
+            content:'';
+            @apply absolute top-0 left-0 w-full h-full filter blur-sm z-0 bg-white opacity-70;
+        }
+        img{
+            @apply z-10;
+            &:not([class*="w-"]){
+                @apply w-32 h-32;
+            }
+        }
+    }
+    .main__container {
+        width: 1440px;
+        padding-left: 160px;
+        padding-right: 40px;
+        @screen 2xl{
+            padding-left: 180px;
+            padding-right: 60px;
+        }
+
+        //SIDEBAR
+        #sidebar-menu {
+            width: calc(100% - 1px);
+            height: calc(100% - 1px);
+            .sidebar {
+                margin-left: -160px;
+                @screen 2xl{
+                    margin-left: -180px;
+                }
+                width: 120px;
+                .sidebar__content {
+                    .sidebar__content__bg {
+                        border-top-left-radius: 40px;
+                    }
+                    .sidebar__item {
+                        transition: all 0.2s ease-out;
+                        height: 132px;
+                        svg {
+                            path,
+                            rect,
+                            circle {
+                                transition: all 0.2s ease-out;
+                            }
+                        }
+                        .sidebar__item__highlight {
+                            width: 0;
+                            transition: all 0.2s ease-out;
+                        }
+                        &.sidebar__item--current,
+                        &:hover {
+                            color: theme("colors.secondary");
+                            svg {
+                                path,
+                                rect {
+                                    fill: theme("colors.secondary");
+                                }
+                                circle {
+                                    stroke: theme("colors.secondary");
+                                }
+                            }
+                            .sidebar__item__highlight {
+                                width: 8px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        //INPUTS
+        .input-radio, .input-checkbox {
+            @apply mr-3 mb-3 flex flex-row flex-nowrap justify-start items-center cursor-pointer;
+            input{
+                width: 13px;
+                height: 13px;
+                @apply appearance-none border border-solid bg-white-dark border-grey-light checked:border-secondary checked:bg-secondary cursor-pointer;
+                &[type="radio"]{
+                    @apply rounded-full;
+                }
+            }
+            label {
+                @apply pl-2 text-xs font-bold cursor-pointer;
+            }
+        }
+        input[type="number"]{
+            -moz-appearance:textfield; /* Firefox */
+            &::-webkit-outer-spin-button, &::-webkit-inner-spin-button{
+                /* display: none; <- Crashes Chrome on hover */
+                -webkit-appearance: none;
+            }
+        }
+        //ADD
+        .add{
+            .icon{
+                @apply cursor-pointer transition transform;
+                svg{
+                    path, circle{
+                        @apply transition;
+                    }
+                }
+                &:hover{
+                    svg {
+                        path, circle {
+                            stroke: theme('colors.secondary');
+                        }
+                    }
+                }
+            }
+        }
+    }
+    #form-campaign{
+        &.demo-form{
+            .entry-label, *[data-entry-action="remove"]{
+                @apply hidden;
+            }
+        }
+    }
+}
+//FILTERS
+#filters {
+    .filter-input {
+        @apply relative z-10;
+        select,
+        input {
+            @apply outline-none;
+            padding: 0 20px;
+            height: 38px;
+            line-height: 38px;
+        }
+        .checkboxes{
+            @apply absolute top-full left-0 w-full max-h-52 overflow-auto hidden flex-col flex-nowrap rounded-b-lg;
+            .option{
+                @apply transition font-light text-xs flex flex-row-reverse flex-nowrap justify-between items-center w-full px-3 py-1.5 cursor-pointer bg-white leading-none;
+                &:hover{
+                    @apply bg-white-dark;
+                }
+                input[type="checkbox"]{
+                    @apply appearance-none w-3 h-3 rounded-full border-solid border-grey-light bg-white border p-0 ml-1;
+                    &:checked{
+                        @apply bg-secondary border-secondary;
+                        &+span{
+                            @apply font-bold text-secondary;
+                        }
+                    }
+                }
+            }
+        }
+        &.open{
+            select, input{
+                @apply rounded-b-none;
+            }
+            .checkboxes{
+                @apply flex;
+            }
+        }
+    }
+}
+
+[x-cloak] {
+    display: none !important;
+}

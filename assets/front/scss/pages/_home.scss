@@ -1,0 +1,12 @@
+.calendar__campaigns {
+    max-height: 192px;
+
+    .scrollbar {
+        max-height: 164px;
+    }
+}
+.home {
+    &__graph-container {
+        height: 400px;
+    }
+}

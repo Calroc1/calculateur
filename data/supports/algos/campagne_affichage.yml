@@ -1,0 +1,72 @@
+- 
+  name: Conception
+  path: conception
+  formula: |
+    ( __FIELD[temps_interne]__ * __EMISSION[temps_conception]__ )
+    + ( __FIELD[temps_externe]__ * __EMISSION[temps_conception]__ )
+    + ( (__FIELD[visio.temps]__ * 60 * __FIELD[visio.participants]__) * __EMISSION[visio]__ / 1000)
+    + ( 
+          (__FIELD[deplacements.voiture]__ * __EMISSION[deplacements.voiture]__) 
+        + (__FIELD[deplacements.avion]__ * __EMISSION[deplacements.avion]__)
+        + (__FIELD[deplacements.train]__ * __EMISSION[deplacements.train]__)
+        + (__FIELD[hotel]__ * __EMISSION[deplacements.hotel]__)
+    )
+-
+  name: Shooting
+  path: shooting
+  formula: |
+      + ( __FIELD[temps_externe]__ * __EMISSION[temps_conception]__ )
+      + ( (__FIELD[visio.temps]__ * 60 * __FIELD[visio.participants]__) * __EMISSION[visio]__ / 1000 )
+      + ( 
+            (__FIELD[deplacements.voiture]__ * __EMISSION[deplacements.voiture]__) 
+            + (__FIELD[deplacements.avion]__ * __EMISSION[deplacements.avion]__)
+            + (__FIELD[deplacements.train]__ * __EMISSION[deplacements.train]__)
+            + (__FIELD[hotel]__ * __EMISSION[deplacements.hotel]__)
+      )
+- 
+  name: Impression
+  path: impression
+  vars: 
+    -
+      name: poids_papier
+      formula: (__FIELD[poids_papier.surface]__ * __FIELD[poids_papier.nb]__ * __FIELD[poids_papier.grammage]__) / 1000000
+    -
+      name: poids_total
+      formula: __VAR[poids_papier]__
+    -
+      name: transport_papetier_imprimeur
+      formula: __FIELD[transport.papetier_imprimeur.distance]__ * ceil(__VAR[poids_total]__ / 15 ) * 2
+    -
+      name: transport_imprimeur_afficheur
+      formula: __FIELD[transport.imprimeur_afficheur.distance]__ * ceil(__VAR[poids_total]__ / 15 ) * 2
+  formula: | 
+      (__VAR[poids_papier]__ * __EMISSION[impression.papier_vierge]__)
+      + (__VAR[poids_papier]__ * __EMISSION[impression.process_impression]__)
+      + (__VAR[transport_papetier_imprimeur]__ * __EMISSION[impression.transport_papetier_imprimeur]__)
+      + (__VAR[transport_imprimeur_afficheur]__ * __EMISSION[impression.transport_imprimeur_afficheur]__)
+- 
+  name: Supports
+  path: supports
+  children:
+    -
+      path: retroeclaires
+      formula: |
+        (__FCT[campaign_conso]__ * __EMISSION[campagne_affichage.panneaux.eclairage_interieur.__FIELD[surface]__]__ / 1000 * __FIELD[faces]__ * __FIELD[duree]__ * __FIELD[duree_moyenne_jour]__)
+        + ( (__FIELD[faces]__ * __EMISSION[campagne_affichage.diffusion]__) + (__FIELD[duree]__ * __EMISSION[campagne_affichage.amortissement_ACV.__FIELD[surface]__]__))
+    -
+      path: eclairage_exterieur
+      formula: |
+        (__FCT[campaign_conso]__ * __EMISSION[campagne_affichage.panneaux.eclairage_exterieur.__FIELD[surface]__]__ / 1000 * __FIELD[faces]__ * __FIELD[duree]__ * __FIELD[duree_moyenne_jour]__)
+        + ( (__FIELD[faces]__ * __EMISSION[campagne_affichage.diffusion]__) + (__FIELD[duree]__ * __EMISSION[campagne_affichage.amortissement_ACV.__FIELD[surface]__]__))
+    -
+      path: lcd
+      formula: |
+        (__FCT[campaign_conso]__ * __FIELD[faces]__ * __FIELD[nb_logs]__ * __FIELD[duree_log]__ * __FIELD[duree]__ * __EMISSION[campagne_affichage.panneaux.lcd]__ * __FIELD[surface]__ * ( 1 / (3600*24) * 1/2) )
+        + ( (__FIELD[faces]__ * __EMISSION[campagne_affichage.diffusion]__) + (__FIELD[duree]__ * __EMISSION[campagne_affichage.amortissement_ACV.__FIELD[surface]__]__))
+    -
+      path: colle
+      formula: __EMISSION[campagne_affichage.panneaux.colle.colle_amidon]__ * __EMISSION[campagne_affichage.panneaux.colle.quantite_colle]__ * (1/1000) * __FIELD[faces]__ * __FIELD[surface]__
+- 
+  name: Fin de vie
+  path: impression
+  formula: __EMISSION[impression.fin_de_vie_papier]__ * ( (__FIELD[poids_papier.surface]__ * __FIELD[poids_papier.nb]__ * __FIELD[poids_papier.grammage]__) / 1000000 )

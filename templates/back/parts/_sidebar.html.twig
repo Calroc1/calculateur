@@ -1,0 +1,87 @@
+<aside class="relative bg-black-light h-screen w-64 hidden sm:block shadow-xl">
+    <div class="p-6">
+        <a href="{{ path('back_home') }}" class="text-white text-3xl font-semibold uppercase hover:opacity-50 transition">Admin</a>
+    </div>
+    <nav class="text-white text-base font-medium pt-3">
+        {% if is_granted('ROLE_ADMIN_SUPER') %}
+            {{ _self.itemSidebar({
+                    icon:'fa-user-lock',
+                    text: "Admins",
+                    route : 'back_admin_home',
+                    activeRoutePrefixes : [
+                        'back_admin'
+                    ]
+                })
+            }}
+        {% endif %}
+        {#}    {{ _self.itemSidebar({
+                icon: 'fa-users',
+                text: "Entreprises",
+                route : 'back_organism_home',
+                activeRoutePrefixes : [
+                    'back_organism'
+                ]
+            })
+        }}    #}     
+        {{ _self.itemSidebar({
+                icon: 'fa-square-root-alt',
+                text: "Facteurs d'émission",
+                route: 'back_emission_home',
+                activeRoutePrefixes : [
+                    'back_emission'
+                ],
+            })
+        }}
+        {{ _self.itemSidebar({
+                icon: 'fa-calculator',
+                text: "Formulaires",
+                route : 'back_support_home',
+                activeRoutePrefixes : [
+                    'back_support'
+                ]
+            })
+        }}
+    </nav>
+    {% if app.request.get('_route') == 'back_emission_algorithm' %}
+        <div class="mt- 10 p-5">
+            <h4 class="text-white">Légende algorithme : </h4>
+            <span class="bg-sky-300 border border-black p-2 my-2 mx-1 rounded-lg relative block text-center">
+                Champ de formulaire
+            </span>
+            <span class="bg-violet-300 border border-black p-2 my-2 mx-1 rounded-lg relative block text-center">
+                Facteur d'émission
+            </span>
+            <span class="bg-yellow-200 border border-black p-2 my-2 mx-1 rounded-lg relative block text-center">
+                Facteur d'émission calculé
+            </span>
+            <span class="bg-white border border-black p-2 my-2 mx-1 rounded-lg relative block text-center">
+                Autre couleur <br/> (voir infobulle)
+            </span>
+        </div>
+    {% endif %}
+</aside>
+
+{% macro itemSidebar(params) %}
+    {% set activeParent = false %}
+    {% for prefix in params.activeRoutePrefixes %}
+        {% if activeParent == false and app.request.get('_route') starts with prefix %}
+            {% set activeParent = true %}
+        {% endif %}
+    {% endfor %}
+    <div class="group">
+        <a href="{{ path(params.route) }}" class="flex items-center text-white py-4 pl-6 transition group-hover:bg-blue {{ activeParent ? 'bg-blue' }}">
+            <i class="fas mr-3 {{ params.icon }}"></i>
+            {{ params.text }}
+        </a>
+        {% if params.children is defined %}
+            <div class="text-sm font-normal mb-2 group-hover:block {{ activeParent ? 'block' : 'hidden' }}">
+                {% for child in params.children %}
+                    <a href="{{ path(child.route) }}" class="flex items-center text-white py-3 pl-10 transition hover:bg-primary {{ app.request.get('_route') == child.route ? 'bg-primary' }}">
+                        <i class="fas mr-2 {{ child.icon }}"></i>
+                        {{ child.text }}
+                    </a>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+{% endmacro %}

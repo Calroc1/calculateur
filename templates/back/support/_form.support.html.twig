@@ -1,0 +1,21 @@
+{% form_theme form 'back/forms/main.html.twig' %}
+{{ form_start(form, { attr: {'novalidate': 'novalidate' } }) }}
+    <div class="grid grid-cols-1 md:grid-cols-2">
+        <div class="pr-6">
+            {{ form_row(form.label) }} 
+            {{ form_row(form.displayName) }}  
+        </div> 
+        <div class="px-6">
+            {{ form_row(form.color) }}  
+        </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2">
+        <div class="pr-6">
+            {{ form_row(form.type) }}              
+        </div>
+        <div class="px-6">
+            {{ form_row(form.referential) }}  
+        </div>
+    </div>
+    <input type="submit" class="align-middle mt-5 px-5 py-2 rounded-full font-semibold text-white border border-radius-10 bg-cyan-500 hover:bg-cyan-600" value="Valider">
+{{ form_end(form) }}

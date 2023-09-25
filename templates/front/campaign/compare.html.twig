@@ -1,0 +1,47 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Outil comparatif{% endblock %}
+
+{% block javascripts %}
+    <script>
+        window.allSteps = {{ getEnabledSupports()|serialize('support:view')|raw }}
+    </script>
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    <section class="col-span-full mt-6 lg:mt-14">
+        <div class="flex flex-row flex-wrap-reverse items-center justify-between">
+            <h1 class="text-3xl font-medium leading-extra-loose text-grey-light">
+                Gérer mes campagnes
+                <span class="font-normal mx-5">|</span>
+                <span class="font-bold text-black">{{ app.request.get('campaign').truncatedName }}</span>
+                <span class="font-normal mx-5">|</span>
+                <span class="font-bold text-black">Outil comparatif</span>
+            </h1>
+        </div>
+    </section>
+    <section class="col-span-full grid grid-cols-12 gap-8">
+        {# GET ALL SUPPORTS EPS POSSIBLES IN THIS CAMPAIGN #}
+        {% set allSupportsVariants = [] %}
+        {% for variant in app.request.get('campaign').variants %}
+            {% for support in variant.supports %}
+                {% set allSupportsVariants = support.name in allSupportsVariants ? allSupportsVariants : allSupportsVariants|merge([support.name]) %}
+            {% endfor %}
+        {% endfor %}
+        {% for variantIndex, variant in app.request.get('campaign').variants %}
+            {% include 'front/parts/_stats_campaign.html.twig' with {
+                'campaign' : variant.campaign,
+                'variantIndex' : variantIndex,
+                'name' : variant.name,
+                'dateCreation' : variant.dateCreation,
+                'author' : variant.author,
+                'statistics' : statisticsByVariant[variantIndex],
+                'budgets' : budgetsByVariant[variantIndex],
+                'contacts' : contactsByVariant[variantIndex],
+                'compareVariants' : true,
+                'supportsToShow' : allSupportsVariants
+            } %}
+        {% endfor %}
+    </section>
+{% endblock %}

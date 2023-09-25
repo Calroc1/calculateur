@@ -1,0 +1,544 @@
+{
+  "temps_conception" :  {
+    "label" : "Conception du document",
+    "value" : 8.83,
+    "comment" : "Ce FE ne prend en compte que les émissions 'fixes' de l'activité de Dagré Communication (Energie, Fret, Déplacements domicile-travail et visiteurs, intrants, déchets, amortissements) pour l'année 2013. Cette valeur n'a parobablement pas changé de manère significative, nous le retenons pour la mise à jour de 2020. Les postes spécifiques aux missions réalisées (déplacements professionnels, fin de vie) sont pris en compte séparément dans l'outil de calcul. "
+  },
+  "visio" : {
+    "label" : "Visio",
+    "value" : 0.403,
+    "unit" : "g/Co2/min"
+  },
+  "deplacements" : {
+    "label" : "Déplacements",
+    "source" : "ADEME bilan carbone v8.4",
+    "children" : {
+      "voiture" : {
+        "label" : "Déplacement en voiture",
+        "value" : 0.218
+      },
+      "train" : {
+        "label" : "Déplacement en train",
+        "value" : 0.00369
+      },
+      "avion" : {
+        "label" : "Déplacement en avion",
+        "value" : 0.314
+      },      
+      "camion" : {
+        "label" : "Déplacement en camion",
+        "value" : 0.46,
+        "source" : "Dans la base carbone V21.0",
+        "comment" : "12T"
+      },
+      "hotel" : {
+        "label" : "Nuitées d'hôtel",
+        "value" : 4.7,
+        "source" : "ADEME - 2017 - https://www.ekopo.fr/post/2018/03/20/h%C3%B4tellerie-1er-bilan-de-l-affichage-environnemental"
+      }
+    }
+  },
+  "impression" : {
+    "label" : "Impression",
+    "children" : {
+      "papier_vierge" : {
+        "label" : "Papier vierge",
+        "value" : 919,
+        "source" : "ADEME bilan carbone v8.4"
+      },
+      "encre" : {
+        "label" : "Encre",
+        "value" : 2.75,
+        "source" : "Base carbone - 2020"
+      },
+      "process_impression" : {
+        "label" : "Process d'impression",
+        "value" : 480,
+        "comment" : "L'ACV réalisée sur les PNA de Carrefour montre une consommation de 7 t de gaz naturel et 4 t de pétrole pour 296 t de PNA. Elle ne prend en compte que les émissions liées aux consommations directes d'énergie. Le BC d'un imprimeur réalisé par nos soins montre que les émissions atteignent 0,5kg équ. CO2/kg de papier produit et prend en compte également les émissions liées à l'ensemble des postes fixes (immobilisations, déplacements des salariés, déchets, produits chimiques). Le FE process correspond aux émissions de GES globales de l’imprimeur ramenées à l’unité de production (hors émissions déjà prises en compte par ailleurs dans notre calcul : papier vierge, encres, emballages, transports amont et aval de l’imprimeur). C'est donc cette valeur qui est retenue ici."
+      },
+      "transport_papetier_imprimeur" : {
+        "label" : "Transport papetier vers imprimeur",
+        "value" : 0.0767,
+        "source" : "ADEME bilan carbone v8.4"
+      },
+      "transport_imprimeur_afficheur" : {
+        "label" : "Transport de l'imprimeur vers centre logistique",
+        "value" : 0.46,
+        "source" : "ADEME bilan carbone v8.4"
+      },
+      "fin_de_vie_papier" : {
+        "label" : "Fin de vie du média papier",
+        "value" : 43.1,
+        "source" : "ADEME bilan carbone v8.4"
+      }
+    }
+  },
+  "campagne_affichage" : {
+    "label" : "Campagne d'affichage",
+    "children" : {
+      "diffusion" : {
+        "label" : "Diffusion",
+        "comment" : "Exemple de rapport km et nombre de faces pour un réseau rural bas-Rhin (chiffres 2012 donnés par Jc Decaux Strasbourg)",
+        "value" : 0.04,
+        "unit" : "kgeCO₂"
+      },  
+      "emissions_fixes" : {
+        "label" : "Emissions fixes afficheur",
+        "source" : "Estimation des émissions amorties de fabrication et de fin de vie d'un panneau en aluminium neuf de 230 kg, d'une durée de vie de 10 ans, et sur lequel une nouvelle affiche y est apposé tous les mois en moyenne.",
+        "value" : 15.813
+      },    
+      "amortissement_ACV" : {
+        "label" : "Amortissement ACV mobilier urbain",
+        "children" : {
+          "2" : 0.527,
+          "4" : 0.825,
+          "8" : 1.719,
+          "12" : 2.063,
+          "18" : 3.854
+        },
+        "source" : "Estimation des émissions amorties de fabrication et de fin de vie d'un panneau en aluminium neuf de 230 kg, d'une durée de vie de 10 ans,et sur lequel une nouvelle affiche y est apposé tous les mois en moyenne.",
+        "comment" : "hypothèse sur 1m²",
+        "unit" : "kgeCO₂"
+      }, 
+      "panneaux" : {
+        "label" : "Consommation des panneaux d'affichage",
+        "comment" : "La base de données des puissances de panneaux est isssue des sites des fabricants de panneaux comme Galvasteel ou cite-led-technologies.fr.",
+        "unit" : "Watt",
+        "children" : {
+          "eclairage_interieur" : {
+            "label" : "éclairage intérieur",
+            "children" : {
+              "2" : 182,
+              "8" : 391,
+              "12" : 640
+            }
+          },
+          "eclairage_exterieur" : {
+            "label" : "éclairage extérieur",
+            "children" : {
+              "8" : 125,
+              "12" : 125
+            }
+          },
+          "lcd" : {            
+            "unit" : "kWh/h",
+            "value" : 7.464,
+            "comment" : "Modélisation et évaluation environnementale de panneaux publicitaires numériques, ADEME (2020). Hypothèses : proportionalité de la consommation d'électricité en fonction de la surface d'affichage"
+          },
+          "deroulant" : {            
+            "label" : "panneau déroulant",
+            "value" : 37.5
+          },
+          "colle" : {
+            "children" : {
+                "colle_amidon" : {
+                  "label" : "FE Colle amidon",
+                  "value" : 550,
+                  "unit" : "Kg CO2 eq / tonnes"
+                },
+                "quantite_colle" : {
+                  "label" : "Quantité de colle utilisée par m²",
+                  "value" : 0.01,
+                  "unit" : "Kg/m²"
+                }
+            }
+          }
+        }    
+      }
+    }
+  },
+  "supports_papier" : {
+    "label" : "Supports papier",
+    "children" : {
+      "diffusion" : {
+        "label" : "Diffusion",
+        "source" : "ADEME bilan carbone v8.4",
+        "children" : {
+          "camion" : 0.46,
+          "camionnette" : {
+            "value" : 0.83,
+            "comment" : "FE \"VUL - < 3,5 tonnes - Diesel routier, incorporation 7% de biodiesel\" de la Base Carbone. La très grande majorité des VUL / camionettes ont une carburation diesel. https://www.statistiques.developpement-durable.gouv.fr/6-millions-de-vehicules-utilitaires-legers-en-circulation-au-1er-janvier-2020"
+          },
+          "voiture" : 0.218
+        }
+      }
+    }    
+  }, 
+  "tv_cine_film" : {
+    "label" : "Tv, cinéma, film",
+    "children" : {
+      "diffusion" : {
+        "label" : "Diffusion",
+        "children" : {
+          "tv" : {
+            "comment" : "par minutes de fonctionnement",
+            "value" : 0.00013466333
+          },
+          "ordinateur" : {
+            "comment" : "par minutes de fonctionnement",
+            "value" : 0.0000948
+          },
+          "cinema" : {
+            "value" : 0.0034216,
+            "comment" : "par minutes de fonctionnement",
+            "source" : "Le calculateur de l'AACC indique une répartition de 80% de projecteurs laser (puissance électrique de 2760 W) et de 20% de projecteurs numériques à lampe xénon (puissance électrique de 7000 W). La puissance électrique moyenne est donc de 3608 W. La formule est : puissance électrique [kW] x (1/3600 h/s) x FE mix électrique [kgCO2e/kWh]. Cela ferait 0,0019967 kgCO2e/min de diffusion en France métropolitaine."
+          }
+        }
+      }
+    }
+  }, 
+  "radio" : {
+    "label" : "Radio",
+    "children" : {
+      "diffusion" : {
+        "label" : "Diffusion",
+        "comment" : "Hypothèse : puissance du poste radio de 10W",
+        "source" : "http://www.energuide.be/fr/questions-reponses/comment-calculer-la-consommation-dun-appareil-electrique/94",
+        "value" : 0.00000016
+      }
+    }    
+  },  
+  "reseaux_sociaux" : {
+    "label" : "Réseaux sociaux",
+    "children" : {
+      "transport" : {
+        "label" : "Répartition des types de transport",
+        "unit" : "%",
+        "children" : {
+          "wifi" : 23,
+          "mobile" : 77,
+          "filaire" : 0
+        }        
+      },
+      "campagne" : {
+        "label" : "Campagne",
+        "unit" : "Poids (Mo/unité)",
+        "comment" : "Hypothèses Dagré+test téléchargement photos réseaux",
+        "children" : {
+          "Post texte" : 0.050,
+          "Post texte + photo" : 0.200,
+          "Post photo" : 0.150,
+          "GIF" : 1
+        }        
+      },
+      "video" : {
+        "label" : "Vidéo, story",
+        "unit" : "Poids (Mo/unité)",
+        "comment" : "Valeurs selon données fournies par Dagré (base HD)",
+        "children" : {
+          "Vidéo, Story" : 25.36
+        }        
+      }
+    }    
+  },
+  "surface_papier" : {
+    "label" : "Surface des supports papier",
+    "unit" : "g équ. CO2 par page",
+    "source" : "- bilan carbone Prisma Presse : 240 millions d’exemplaires / an, 135000 t équ. CO2 dont 92% liés à production et diffusion des magazines => 520 g équ. CO2 / magazine\n- bilan carbone GEO : 570 g équ. CO2 / magazine, soit 5g équ.CO2 / page A4 avec hypothèse de 100p",
+    "children" : {
+      "A6" : 1,
+      "A5" : 2,
+      "A4" : 4,
+      "A3" : 8,
+      "A2" : 16,
+      "A1" : 32,
+      "A0" : 64
+    }    
+  },
+  "consommation_electrique" : {
+    "label" : "Consommation électrique",
+    "children" : {
+      "datacenters" : {
+        "label" : "Datacenters",
+        "unit" : "kWh/Go.an",
+        "comment" : "moyenne entre : Valeur 2020, The shift project : LEAN-ICT-MATERIALS-FORECAST / https://www.iea.org/commentaries/the-carbon-footprint-of-streaming-video-fact-checking-the-headlines",
+        "value" : 0.02
+      },
+      "reseau" : {
+        "label" : "Consommation par type de transport",
+        "unit" : "kWh/Go",
+        "comment" : "moyenne entre Valeur 2020, The shift project : LEAN-ICT-MATERIALS-FORECAST + GHG-Protocol ICTSG p4-29",
+        "children" : {
+          "filaire" : 0.18,
+          "wifi" : 0.11,
+          "mobile" : 1.56
+        }
+      },
+      "appareils" : {
+        "label" : "Appareils",
+        "children" : {
+          "box" : {
+            "children" : {
+              "kwh/an" : {                
+                "label" : "Consommation annuelle",
+                "unit" : "kWh/an",
+                "value": 150,
+                "comment" : "ADEME face cachée du numérique +  Shift projet : REN_LEAN-ICT-Materials"
+              },
+              "duree" : {
+                "label" : "Durée d'utilisation",
+                "unit" : "h/j",
+                "comment" : "Hypothèses Shift : Rapport LEAN ICT Pour une sobriété numérique p71",
+                "value" : 24
+              }
+            }            
+          },
+          "smartphone" : {
+            "children" : {
+              "kwh/an" : {                
+                "label" : "Consommation annuelle",
+                "unit" : "kWh/an",
+                "value": 4.5,
+                "comment" : "ADEME face cachée du numérique +  Shift projet : REN_LEAN-ICT-Materials"
+              },
+              "duree" : {
+                "label" : "Durée d'utilisation",
+                "unit" : "h/j",
+                "comment" : "Hypothèses Shift : Rapport LEAN ICT Pour une sobriété numérique p71",
+                "value" : 2.5
+              }
+            }            
+          },
+          "tablette" : {
+            "children" : {
+              "kwh/an" : {                
+                "label" : "Consommation annuelle",
+                "unit" : "kWh/an",
+                "value": 10,
+                "comment" : "ADEME face cachée du numérique +  Shift projet : REN_LEAN-ICT-Materials"
+              },
+              "duree" : {
+                "label" : "Durée d'utilisation",
+                "unit" : "h/j",
+                "comment" : "Hypothèses Shift : Rapport LEAN ICT Pour une sobriété numérique p71",
+                "value" : 2.5
+              }
+            }            
+          },
+          "ordi_fixe" : {
+            "children" : {
+              "kwh/an" : {                
+                "label" : "Consommation annuelle",
+                "unit" : "kWh/an",
+                "value": 185,
+                "comment" : "ADEME face cachée du numérique +  Shift projet : REN_LEAN-ICT-Materials"
+              },
+              "duree" : {
+                "label" : "Durée d'utilisation",
+                "unit" : "h/j",
+                "comment" : "Hypothèses Shift : Rapport LEAN ICT Pour une sobriété numérique p71",
+                "value" : 8
+              }
+            }            
+          },
+          "ordi_portable" : {
+            "children" : {
+              "kwh/an" : {                
+                "label" : "Consommation annuelle",
+                "unit" : "kWh/an",
+                "value": 65,
+                "comment" : "ADEME face cachée du numérique +  Shift projet : REN_LEAN-ICT-Materials"
+              },
+              "duree" : {
+                "label" : "Durée d'utilisation",
+                "unit" : "h/j",
+                "comment" : "Hypothèses Shift : Rapport LEAN ICT Pour une sobriété numérique p71",
+                "value" : 8
+              }
+            }            
+          },
+          "tv" : {
+            "children" : {
+              "kwh/an" : {                
+                "label" : "Consommation annuelle",
+                "unit" : "kWh/an",
+                "value": 157,
+                "comment" : "ADEME face cachée du numérique +  Shift projet : REN_LEAN-ICT-Materials"
+              },
+              "duree" : {
+                "label" : "Durée d'utilisation",
+                "unit" : "h/j",
+                "comment" : "Hypothèses Shift : Rapport LEAN ICT Pour une sobriété numérique p71",
+                "value" : 5
+              }
+            }            
+          }
+        }        
+      }
+    }    
+  },  
+  "web" : {
+    "label" : "Campagne web",
+    "children" : {
+      "site_web" : {
+        "label" : "Site web",
+        "source" : "https://www.artwai.com/poids-ideal-page-web/",
+        "unit" : "Poids (Mo/unité)",
+        "value" : 1.92
+      },
+      "transport" : {
+        "label" : "Répartition des types de transport",
+        "unit" : "%",
+        "children" : {
+          "filaire" : 39,
+          "wifi" : 47,
+          "mobile" : 14
+        }        
+      },
+      "communication" : {        
+        "label" : "Communication",
+        "comment" : "Source Ademe (base carbone 21.1)",
+        "children" : {
+          "mail" : 0.004,
+          "web_navigation" : 0.00101,
+          "duree_stockage" : {
+              "comment" : "",
+              "value" : 10
+          }
+        }        
+      }
+    }    
+  },  
+  "localization" : {    
+    "label" : "Facteur d'émission électrique par pays",
+    "comment" : "Calculateur bilobay+base carbone IFC",
+    "children" : {
+      "FR": 0.0569,    
+      "US": 0.522,    
+      "CA": 0.186,
+      "CL": 0.41,
+      "MX": 0.455,
+      "AU": 0.841,
+      "IL": 0.689,
+      "JP": 0.416,
+      "KR": 0.533,
+      "NZ": 0.15,
+      "AT": 0.188,
+      "BE": 0.22,
+      "CZ": 0.589,
+      "DK": 0.36,
+      "EE": 1.01,
+      "FI": 0.229,
+      "DE": 0.461,
+      "GR": 0.718,
+      "HU": 0.317,
+      "IS": 0.000183,
+      "IE": 0.458,
+      "IT": 0.406,
+      "LU": 0.41,
+      "NL": 0.415,
+      "NO": 0.0167,
+      "PL": 0.781,
+      "PT": 0.255,
+      "SK": 0.197,
+      "SI": 0.325,
+      "ES": 0.238,
+      "SE": 0.0296,
+      "CH": 0.0273,
+      "TR": 0.46,
+      "GB": 0.457,
+      "AL": 0.00215,
+      "AM": 0.0922,
+      "AZ": 0.439,
+      "BY": 0.449,
+      "BA": 0.723,
+      "BG": 0.535,
+      "HR": 0.236,
+      "CY": 0.697,
+      "GE": 0.0687,
+      "GI": 0.762,
+      "KZ": 0.403,
+      "XK": 1.29,
+      "KG": 0.0591,
+      "LV": 0.12,
+      "LT": 0.337,
+      "MK": 0.685,
+      "MT": 0.872,
+      "MD": 0.517,
+      "ME": 0.405,
+      "RO": 0.413,
+      "RU": 0.384,
+      "RS": 0.718,
+      "TJ": 0.0143,
+      "TM": 0.954,
+      "UA": 0.392,
+      "UZ": 0.55,
+      "DZ": 0.548,
+      "AO": 0.44,
+      "BJ": 0.72,
+      "BW": 2.52,
+      "CM": 0.207,
+      "CG": 0.142,
+      "CD": 0.00291,
+      "CI": 0.445,
+      "EG": 0.45,
+      "ER": 0.646,
+      "ET": 0.00701,
+      "GA": 0.383,
+      "GH": 0.259,
+      "KE": 0.274,
+      "LY": 0.885,
+      "MA": 0.718,
+      "MZ": 0.000648,
+      "NA": 0.197,
+      "NG": 0.405,
+      "SN": 0.637,
+      "ZA": 0.927,
+      "SD": 0.344,
+      "TZ": 0.329,
+      "TG": 0.195,
+      "TN": 0.463,
+      "ZM": 0.00268,
+      "ZW": 0.66,
+      "BD": 0.593,
+      "BN": 0.717,
+      "KH": 0.804,
+      "TW": 0.624,
+      "IN": 0.912,
+      "ID": 0.709,
+      "KP": 0.465,
+      "MY": 0.727,
+      "MN": 0.949,
+      "MM​": 0.262,
+      "NP": 0.00106,
+      "PK": 0.425,
+      "PH": 0.481,
+      "SG": 0.499,
+      "LK": 0.379,
+      "TH": 0.513,
+      "VN": 0.432,
+      "CN": 0.766,
+      "AR": 0.367,
+      "BO": 0.423,
+      "BR": 0.0868,
+      "CO": 0.176,
+      "CR": 0.0557,
+      "CU": 1.01,
+      "DO": 0.589,
+      "EC": 0.389,
+      "SV": 0.223,
+      "GT": 0.286,
+      "HT": 0.538,
+      "HN": 0.332,
+      "JM": 0.711,
+      "AN": 0.707,
+      "NI": 0.46,
+      "PA": 0.298,
+      "PE": 0.289,
+      "TT": 0.7,
+      "UY": 0.081,
+      "VE": 0.264,
+      "BH": 0.64,
+      "IQ": 1,
+      "JO": 0.566,
+      "KW": 0.842,
+      "LB": 0.709,
+      "OM": 0.794,
+      "QA": 0.494,
+      "SA": 0.737,
+      "SY": 0.594,
+      "AE": 0.598,
+      "YE": 0.655
+    }    
+  }
+}

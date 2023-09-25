@@ -1,0 +1,28 @@
+{% form_theme form 'front/forms/main.html.twig' %}
+{{ form_start(form, { attr: {'novalidate': 'novalidate', 'class' : 'col-span-full lg:col-span-10 xl:col-span-8 grid lg:gap-x-8 gap-y-12 lg:gap-y-8' } }) }}
+    <section class="col-span-full">
+        <div class="flex flex-nowrap flex-row justify-between items-center pl-5">
+            <div class="relative flex-1 py-4">
+                <div class="font-black relative flex flex-nowrap flex-row justify-start items-center w-max max-w-full cursor-pointer">
+                    <h3>Coordonnées</h3>
+                </div>
+            </div>
+            <button type="submit" class="btn btn--primary my-0 ml-10">Sauvegarder</button>
+        </div>
+    </section>
+    <section class="col-span-full flex flex-col justify-start items-end">
+        <div class="bg-white px-6 py-4 rounded-lg w-full">
+            {{ form_row(form.name) }}
+            <div class="flex flex-wrap flex-row items-start">
+                {{ form_row(form.email, { 'row_attr' : { 'class' : 'w-full lg:w-1/2 lg:pr-4' } }) }}
+                {{ form_row(form.phone, { 'row_attr' : { 'class' : 'w-full lg:w-1/2' } }) }}
+            </div>
+            {{ form_row(form.address) }}
+            <div class="flex flex-wrap flex-row items-start">
+                {{ form_row(form.city, { 'row_attr' : { 'class' : 'w-full lg:w-1/2 lg:pr-4' } }) }}
+                {{ form_row(form.postalCode, { 'row_attr' : { 'class' : 'w-full lg:w-1/2' } }) }}                    
+            </div>
+            {{ form_row(form.country) }}
+        </div>
+    </section>
+ {{ form_end(form) }}

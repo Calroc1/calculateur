@@ -1,0 +1,12 @@
+{% extends 'front/modal/base.html.twig' %}
+
+{% block body %}
+    <div x-data="filtersCampaigns">
+        <div id="filters" class="flex flex-row flex-wrap justify-between items-start">
+            {% include "front/parts/_filters_campaigns.html.twig" with { 'multiselect' : false } %}
+        </div>
+        <div class="text-center mt-8">
+            <button type="submit" class="btn btn--primary" :class="filter.campaigns.length === 0 && 'btn--disabled'">Ajouter</button>
+        </div>
+    </div>
+{% endblock %}

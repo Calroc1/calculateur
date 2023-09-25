@@ -1,0 +1,29 @@
+- 
+  name: Conception
+  path: conception
+  formula: |
+    ( __FIELD[temps_interne]__ * __EMISSION[temps_conception]__ )
+    + ( __FIELD[temps_externe]__ * __EMISSION[temps_conception]__ )
+    + ( (__FIELD[visio.temps]__ * 60 * __FIELD[visio.participants]__) * __EMISSION[visio]__ / 1000)
+    + ( 
+          (__FIELD[deplacements.voiture]__ * __EMISSION[deplacements.voiture]__) 
+        + (__FIELD[deplacements.avion]__ * __EMISSION[deplacements.avion]__)
+        + (__FIELD[deplacements.train]__ * __EMISSION[deplacements.train]__)
+        + (__FIELD[hotel]__ * __EMISSION[deplacements.hotel]__)
+    )
+-
+  name: Shooting
+  path: shooting
+  formula: |
+      + ( __FIELD[temps_externe]__ * __EMISSION[temps_conception]__ )
+      + ( (__FIELD[visio.temps]__ * 60 * __FIELD[visio.participants]__) * __EMISSION[visio]__ / 1000 )
+      + ( 
+            (__FIELD[deplacements.voiture]__ * __EMISSION[deplacements.voiture]__) 
+            + (__FIELD[deplacements.avion]__ * __EMISSION[deplacements.avion]__)
+            + (__FIELD[deplacements.train]__ * __EMISSION[deplacements.train]__)
+            + (__FIELD[hotel]__ * __EMISSION[deplacements.hotel]__)
+      )
+- 
+  name: Impression
+  path: impression_diffusion
+  formula: __EMISSION[surface_papier.__FIELD[format]__]__ * __FIELD[tirage]__ / 1000

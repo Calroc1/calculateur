@@ -1,0 +1,10 @@
+{% form_theme form 'front/forms/campaign.html.twig' %}
+{{ form_start(form, { 'attr' : { 'id' : 'form-campaign' } }) }}
+{% if form.vars.submitted and form.vars.valid == false %}
+	{{ showNotification('Il y a des erreurs dans le formulaire.', 'error') }}
+{% endif %}
+{% for children in form.children %}
+	{{ form_row(children) }}
+{% endfor %}
+<input type="submit" class="hidden">
+{{ form_end(form) }}

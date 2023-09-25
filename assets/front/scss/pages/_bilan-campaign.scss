@@ -1,0 +1,19 @@
+.dropdown{
+  .arrow{
+    @apply -rotate-45;
+  }
+  .stats, .stat__details{
+    @apply hidden;
+  }
+  &.open{
+    .arrow{
+      @apply rotate-45;
+    }
+    .stats{
+      @apply grid;
+    }
+    .stat__details{
+      @apply block;
+    }
+  }
+}

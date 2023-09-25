@@ -1,0 +1,215 @@
+/* LIST */
+.list {
+    // PAGE
+    &__home {
+        --mainDatasPaddingRight: 1rem;
+        --itemOptions: 2;
+
+        --mainTitle: 300px;
+        --mainDateEnd: 100px;
+        --mainStatusTranslated: 180px;
+    }
+    &__campaigns {
+        --mainDatasPaddingRight: 1rem;
+        --itemOptions: 2;
+
+        --mainTitle: auto;
+        --mainAuthor: 140px;
+        --mainDateEnd: 120px;
+        --mainStatusTranslated: 180px;
+    }
+    &__organism {
+        --mainDatasPaddingRight: 1rem;
+        --itemOptions: 2;
+
+        --mainTitle: 300px;
+        --mainStatusTranslated: 180px;
+    }
+
+    &--nested {
+        .item {
+            @apply border-l-0;
+
+            &__main__statusTranslated {
+                @apply text-grey-light text-xs font-medium;
+            }
+        }
+    }
+
+    // GENERAL
+    &__sort {
+        padding-right: calc(3.5rem * var(--itemOptions));
+        &__filter {
+            &[data-filter="author"] {
+                width: var(--mainAuthor);
+            }
+            &[data-filter="dateEnd"] {
+                width: var(--mainDateEnd);
+            }
+            &[data-filter="statusTranslated"] {
+                width: var(--mainStatusTranslated);
+            }
+        }
+        &__desktop {
+            padding-right: var(--mainDatasPaddingRight);
+
+            svg {
+                @apply transform;
+            }
+            &.filtering {
+                &--0 .filtering svg {
+                    @apply rotate-0;
+                }
+                &--1 .filtering svg {
+                    @apply rotate-90;
+                }
+                &--2 .filtering svg {
+                    @apply -rotate-90;
+                }
+            }
+        }
+        &--nested {
+            .list__sort__filter:first-child {
+                @apply flex-grow pl-4;
+            }
+        }
+    }
+
+    .item {
+        &__main {
+            &__title {
+                width: var(--mainTitle);
+            }
+            &__datas {
+                padding-right: var(--mainDatasPaddingRight);
+            }
+            &__author {
+                width: var(--mainAuthor);
+            }
+            &__dateEnd {
+                width: var(--mainDateEnd);
+            }
+            &__statusTranslated {
+                width: var(--mainStatusTranslated);
+            }
+        }
+    }
+}
+
+/* COMMON */
+.item,
+.notif {
+    &__option {
+        &::before {
+            content: "";
+            @apply absolute left-0 h-9 w-px bg-grey-dark;
+        }
+        svg > * {
+            @apply fill-current transition-colors duration-200;
+        }
+    }
+}
+
+/* LIST ITEM */
+.item {
+    &--FINISHED {
+        @apply text-green;
+    }
+
+    &--STARTED,
+    &--COMPLETED {
+        @apply text-purple;
+    }
+
+    &:hover {
+        .item__main__title {
+            @apply transform translate-x-1.5;
+        }
+    }
+
+    // Related to object key name
+    &__main {
+        &__name {
+            @apply text-black;
+        }
+
+        &__author,
+        &__dateEnd {
+            @apply text-grey-light font-medium text-xs;
+        }
+        &__statusTranslated {
+            @apply font-bold capitalize;
+        }
+    }
+
+    &__options {
+        .item__option {
+            &:last-child {
+                @apply bg-primary text-white hover:bg-secondary transition-colors duration-200;
+
+                &::before {
+                    @apply hidden;
+                }
+            }
+        }
+    }
+
+    &__details {
+        .item__option {
+            &::before {
+                @apply left-auto right-0;
+            }
+            &:last-child::before {
+                @apply hidden;
+            }
+        }
+    }
+}
+
+/* NOTIF */
+.notifs {
+    .notif {
+        &--FINISHED {
+            @apply text-green;
+            &::before,
+            &::after {
+                @apply bg-green;
+            }
+        }
+
+        &--STARTED,
+        &--COMPLETED {
+            @apply text-purple;
+            &::before,
+            &::after {
+                @apply bg-purple;
+            }
+        }
+
+        &--ARCHIVED {
+            @apply text-black;
+            &::before,
+            &::after {
+                @apply bg-black;
+            }
+        }
+
+        &::before {
+            content: "";
+            @apply absolute top-0 w-2 h-full;
+        }
+
+        &::before {
+            @apply left-0 rounded-r-lg;
+        }
+    }
+
+    &__calendar {
+        .notif {
+            // &::after {
+            //     content: "";
+            //     @apply absolute top-0 w-2 h-full right-0 rounded-l-lg;
+            // }
+        }
+    }
+}

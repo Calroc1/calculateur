@@ -1,0 +1,15 @@
+{% extends 'front/modal/base.html.twig' %}
+
+{% block body %}
+    {% if form.vars.submitted == false or form.vars.valid == false %}
+        {% form_theme form 'front/forms/main.html.twig' %}
+        {{ form_start(form, { attr: {'novalidate': 'novalidate' } }) }}
+            {{ form_row(form.message) }}
+            <div class="text-center">
+                <button type="submit" class="btn btn--primary">Envoyer</button>
+            </div>
+        {{ form_end(form) }}
+    {% else %}
+        {{ showNotification('Votre message a bien été envoyé', 'success') }}
+    {% endif %}
+{% endblock %}

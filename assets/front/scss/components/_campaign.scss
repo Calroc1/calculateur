@@ -1,0 +1,180 @@
+.step {
+  svg {
+    path {
+      @apply transition;
+    }
+  }
+  &:hover {
+    svg {
+      path {
+        fill: theme("colors.secondary");
+      }
+    }
+  }
+}
+
+.stat {
+  > li {
+    @apply relative;
+
+    canvas {
+      color: currentColor;
+    }
+  }
+
+  &__details {
+    min-width: 175px;
+  }
+
+  &__line,
+  &__pastille,
+  &__details .header {
+    background-color: rgb(var(--currentColor));
+  }
+}
+
+.tabs-campaign {
+  @apply absolute z-10 pl-2.5 bottom-full left-0 flex flex-nowrap items-center justify-start;
+  .tab {
+    @apply opacity-40 rounded-t-lg border-l-8 py-2.5 pl-7 pr-8 text-2xs font-bold bg-white relative transition cursor-pointer z-0;
+    &:hover,
+    &.active,
+    &.open-modal {
+      @apply opacity-100;
+    }
+    .modify {
+      @apply absolute transform right-0 w-8 top-1/2 -translate-y-1/2 cursor-pointer h-full flex justify-center items-center;
+      .icon {
+        &:hover,
+        &.open-modal {
+          svg {
+            path {
+              fill: theme("colors.secondary");
+            }
+          }
+        }
+      }
+    }
+  }
+  .add {
+    @apply ml-2.5 relative;
+    .icon {
+      &.open-modal {
+        @apply rotate-45;
+        svg {
+          path,
+          circle {
+            stroke: theme("colors.secondary");
+          }
+        }
+      }
+    }
+    .modal {
+      @apply mt-1.5;
+    }
+  }
+  svg {
+    path,
+    circle {
+      @apply transition;
+    }
+  }
+  .modal {
+    @apply top-full left-0;
+  }
+}
+.modal.modal-rename {
+  @apply py-3.5 px-2.5 absolute bg-white z-10 rounded-md rounded-tl-none border-solid border border-white-verydark w-max;
+}
+.info-title {
+  @apply absolute left-full top-0 ml-6 box-shadow rounded-r-lg bg-white z-10;
+  .ampule {
+    @apply w-6 absolute top-0 left-0 bg-white border-white border-r-2 border-t-2 border-b-2 border-solid rounded-r-lg py-1.5 cursor-pointer transition hover:bg-secondary hover:border-secondary;
+  }
+  .text {
+    @apply text-xs text-justify border-r-2 border-t-2 border-b-2 border-solid rounded-r-lg border-secondary pl-10 py-5 pr-6 w-80 transition hidden;
+  }
+  &.open {
+    .ampule {
+      @apply bg-secondary border-secondary rounded-tr-none;
+    }
+    .text {
+      @apply block;
+    }
+  }
+}
+.bilan-version-campaign {
+  &.disabled {
+    .infos {
+      @apply opacity-20 cursor-auto pointer-events-none;
+    }
+  }
+  .title {
+    min-height: 55px;
+  }
+}
+.add-campaign-comparative {
+  .plus {
+    svg {
+      path,
+      circle {
+        @apply transition;
+      }
+    }
+  }
+  &:hover {
+    .plus {
+      svg {
+        path,
+        circle {
+          stroke: theme("colors.secondary");
+        }
+      }
+    }
+  }
+}
+
+.accordion-control {
+  @apply cursor-pointer;
+  h2::after {
+    @apply inline-block transition font-medium ml-4;
+    content: "+";
+  }
+  &.open {
+    h2::after {
+      @apply transform rotate-45;
+    }
+  }
+}
+.accordion-container {
+  @apply hidden;
+  &.open {
+    @apply block;
+  }
+}
+
+ul.list-circle {
+  list-style: circle;
+}
+
+
+.table-steps {
+  border:1px solid theme("colors.primary");
+  th{
+    min-width:60px;
+    border:1px solid theme("colors.primary");
+  }
+  td{
+    border:1px solid theme("colors.primary");
+    vertical-align: top;
+  }
+  .input-radio {
+    flex-direction: column;
+    margin-right:0;
+    label{
+      margin-top:5px;
+      padding-left:0;
+      font-weight:normal;
+    }
+  }
+}

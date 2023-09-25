@@ -1,0 +1,51 @@
+{% use "form_div_layout.html.twig" %}
+
+{% block form_start -%}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' py-10 px-8 flex flex-col')|trim}) %}
+    {{- parent() -}}
+{%- endblock form_start %}
+
+{%- block widget_attributes -%}
+    {% if errors|length > 0 %}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' border-2 border-red')|trim}) %}
+    {% endif %}
+    {{- parent() -}}
+{%- endblock widget_attributes -%}
+
+{%- block form_row -%}
+    {% set row_attr = row_attr|merge({class: (row_attr.class|default('') ~ ' flex flex-col justify-start items-start mb-2')|trim}) %}
+    {%- set widget_attr = {} -%}
+    {%- if help is not empty -%}
+        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
+    {%- endif -%}
+    <{{ element|default('div') }}{% with {attr: row_attr|merge({class: (row_attr.class|default('') ~ ' flex flex-col justify-start items-start mb-2')|trim})} %}{{ block('attributes') }}{% endwith %}>
+        {{- form_label(form) -}}
+        {{- form_widget(form, widget_attr) -}}
+        {{- form_errors(form) -}}
+    </{{ element|default('div') }}>
+{%- endblock form_row -%}
+
+{% block form_label -%}   
+    {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' my-4')|trim}) -%}
+    {{- parent() -}}
+{%- endblock form_label %}
+
+{%- block form_widget_simple -%}
+    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' w-full bg-white-dark px-4 py-3 rounded-lg')|trim}) -%}
+    {{- parent() -}}
+{%- endblock form_widget_simple -%}
+
+{%- block form_errors -%}
+    {%- if errors|length > 0 -%}
+        <ul class="w-full">
+            {%- for error in errors -%}
+                <li class="block">
+                    <div class="flex my-2 items-center bg-red text-white font-bold px-4 py-3" role="alert">
+                        {{ includeSVG('info.svg') }}
+                        <p>{{ error.message }}</p>
+                    </div>
+                </li>
+            {%- endfor -%}
+        </ul>
+    {%- endif -%}
+{%- endblock form_errors -%}

@@ -1,0 +1,288 @@
+<div x-data="filtersCampaigns" class="col-span-full">
+    <section class="col-span-full">
+        <div class="flex flex-nowrap flex-row justify-start items-center mb-2">
+            <div class="relative px-7">
+                <h2>Statistiques</h2>
+            </div>
+            <div class="bg-white-verydark h-px flex-1"></div>
+        </div>
+        <form action="" @submit="generateCumulative($event)" id="filters" class="flex flex-col flex-wrap xl:flex-row xl:justify-between items-start xl:items-end mb-7 xl:mb-10">
+            <div class="flex flex-row flex-wrap justify-start items-start">
+                {% include "front/parts/_filters_campaigns.html.twig" with { 'multiselect' : true } %}
+                <button type="submit" class="btn btn--primary min-w-0 mt-auto box-content relative" :class="isLoading && 'loading'">
+                    Générer
+                    <template x-if="isLoading">
+						<span class="loader">
+							<img class="mx-auto my-20 w-8" src="{{ asset('media/pictos/loader.gif') }}" alt="">
+						</span>
+                    </template>
+                </button>
+            </div>
+        </form>
+    </section>
+    {% if app.request.get('campaigns') %}
+        <section class="col-span-full grid grid-cols-6 lg:grid-cols-12 lg:gap-x-8 gap-y-12 lg:gap-y-8">
+            <div class="col-span-full lg:col-span-8">
+                <div class="bg-white px-6 py-4 rounded-lg w-full relative">
+                    {% if budgets is defined and app.user.status == 'SUPERVISOR' %}
+                        <div class="dropdown">
+                            <div class="flex flex-nowrap flex-row justify-start items-center my-4 relative">
+                                <div class="relative pr-7 cursor-pointer toggle-dropdown">
+                                    <h2>Budget global associé aux campagnes</h2>
+
+                                    <div class="absolute top-1/2 transition transform -translate-y-1 right-2.5 border-solid border-2 border-t-0 border-l-0 border-black-light w-2.5 h-2.5 arrow"></div>
+                                </div>
+
+                                <div class="bg-white-verydark h-px flex-1"></div>
+                            </div>
+
+                            <div class="stats">
+                                <div class="mb-2 ml-4">
+                                    <span class="text-primary">{{ budgets ? budgets.global|number_format(0, '.', ' ') : '0' }}</span> euros (HT)
+                                </div>
+
+                                <div class="font-bold">Répartition du budget de vos campagnes de communication</div>
+
+                                <div class="mb-6 grid gap-8 grid-cols-12">
+                                    <div class="col-span-full lg:col-span-5">
+                                        <canvas class="chart-radio-bilan mt-4" height="240" data-budget="1">
+                                            {% for key, budget in budgets|slice(1) %}
+                                                <div class="stat" data-name="{{ key }}" data-stat="{{ getPercent(budget, budgets.global) }}"></div>
+                                            {% endfor %}
+                                        </canvas>
+                                    </div>
+
+                                    <div class="col-span-full lg:col-span-7">
+                                        <canvas class="chart-bar-bilan mt-4" height="240" data-budget="1">
+                                            {% for key, budget in budgets|slice(1) %}
+                                                <div class="stat" data-name="{{ key }}" data-stat="{{ budget }}"></div>
+                                            {% endfor %}
+                                        </canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="dropdown">
+                        <div class="flex flex-nowrap flex-row justify-start items-center my-4 relative">
+                            <div class="relative pr-7 cursor-pointer toggle-dropdown">
+                                <h2>Bilan global</h2>
+                                <div class="absolute top-1/2 transition transform -translate-y-1 right-2.5 border-solid border-2 border-t-0 border-l-0 border-black-light w-2.5 h-2.5 arrow"></div>
+                            </div>
+                            <div class="bg-white-verydark h-px flex-1"></div>
+                        </div>
+                        <div class="mb-6 grid gap-8 grid-cols-12 stats">
+                            <div class="col-span-full lg:col-span-5">
+                                <div class="font-bold">Répartition de l’empreinte carbone de vos campagnes de communication</div>
+                                <canvas class="chart-radio-bilan mt-4" height="240">
+                                    {% for key, stat in statistics %}
+                                        <div class="stat" data-name="{{ key }}" data-stat="{{ getPercent(getTotal(stat), getNestedTotal(statistics)) }}"></div>
+                                    {% endfor %}
+                                </canvas>
+                            </div>
+                            <div class="col-span-full lg:col-span-7">
+                                <div class="font-bold">Empreinte carbone de vos campagnes<br>(tonnes équivalent CO₂)</div>
+                                <canvas class="chart-bar-bilan mt-4" height="240">
+                                    {% for key, stat in statistics %}
+                                        <div class="stat" data-name="{{ key }}" data-stat="{{ toTons(getTotal(stat)) }}"></div>
+                                    {% endfor %}
+                                </canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if contacts is defined %}
+                        {% set totalContacts = 0 %}
+
+                        {% for key, contact in contacts %}
+                            {% set totalContacts = totalContacts + contact.contacts %}
+                        {% endfor %}
+
+                        {% if totalContacts > 0 %}
+                            <div class="dropdown">
+                                <div class="flex flex-nowrap flex-row justify-start items-center my-4 relative">
+                                    <div class="relative pr-7 cursor-pointer toggle-dropdown">
+                                        <h2>Emission par contact</h2>
+
+                                        <div class="absolute top-1/2 transition transform -translate-y-1 right-2.5 border-solid border-2 border-t-0 border-l-0 border-black-light w-2.5 h-2.5 arrow"></div>
+                                    </div>
+
+                                    <div class="bg-white-verydark h-px flex-1"></div>
+                                </div>
+
+                                <div class="stats">
+                                    <div class="font-bold">Détail des émissions par contact par média (g CO2eq/contact)</div>
+
+                                    <div class="mb-6 grid gap-8 grid-cols-12">
+                                        <div class="col-span-full lg:col-span-8">
+                                            <canvas class="chart-bar-bilan mt-4" height="240" data-contact="1">
+                                                {% for key, contact in contacts %}
+                                                    <div class="stat" data-name="{{ key }}" data-stat="{{ contact.contacts > 0 ? (toGrams(getTotal(statistics[key])) / contact.contacts)|round(2) : 0 }}"></div>
+                                                {% endfor %}
+                                            </canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+
+                    <div class="flex items-center gap-x-2 mt-12 mb-6">
+                    <span class="font-bold">Statistiques par étapes</span>
+                    <hr class="flex-grow">
+                    </div>
+
+                    {% for key, stat in statistics %}
+                        {% set support = getSupportByName(key) %}
+                        {% set total = getTotal(stat) %}
+                        <div class="dropdown">
+                            <div class="flex flex-nowrap flex-row justify-start items-center my-4 relative">
+                                <div class="relative pr-7 cursor-pointer toggle-dropdown">
+                                    <h2>{{ support.label }}</h2>
+                                    <div class="absolute top-1/2 transition transform -translate-y-1 right-2.5 border-solid border-2 border-t-0 border-l-0 border-black-light w-2.5 h-2.5 arrow"></div>
+                                </div>
+                                <div class="bg-white-verydark h-px flex-1"></div>
+                            </div>
+                            <div class="mb-4 gap-8 grid-cols-12 stats">
+                                <div class="col-span-full lg:col-span-5">
+                                    <div class="font-bold">Répartition de l'empreinte carbone de votre {{ support.label|lower }}</div>
+                                    <canvas class="chart-radio-bilan mt-4" height="240">
+                                        {% for name, statSupport in stat %}
+                                            <div class="stat stat--sub" data-name="{{ key }}" data-label="{{ name }}" data-stat="{{ getPercent(statSupport, getTotal(stat)) }}"></div>
+                                        {% endfor %}
+                                    </canvas>
+                                </div>
+                                <div class="col-span-full lg:col-span-7 leading-tight">
+                                    <div class="px-2">
+                                        <div class="flex flex-row flex-nowrap items-end text-xs">
+                                            <div class="w-2/6 px-2 pb-3">
+                                                <span class="font-medium">Phase</span>
+                                            </div>
+                                            <div class="w-3/6 px-2 pb-3 border-l border-solid border-white-verydark">
+                                                <span class="font-medium">Empreinte<br>carbonne</span>
+                                            </div>
+                                            <div class="w-1/6 px-2 pb-3 border-l border-solid border-white-verydark">
+                                                <span class="font-medium">Part relative</span>
+                                            </div>
+                                        </div>
+                                        {% for name, statSupport in stat %}
+                                            <div class="flex flex-row flex-nowrap items-stretch text-2xs">
+                                                <div class="w-2/6 px-2 pb-3 pt-0.5 font-medium">{{ name }}</div>
+                                                <div class="w-3/6 px-2 pb-3 border-l border-solid border-white-verydark font-medium">
+                                                    <span class="text-primary text-base font-bold">{{ statSupport }}</span>
+                                                    kgéqCO₂<br>
+                                                    <span class="italic">soit
+														{{ toKmVoiture(toTons(statSupport)) }}
+														km en voiture</span><br>
+                                                    <span class="italic">soit
+														{{ toAnneesEmissionFr(toTons(statSupport)) }}
+														années d’émissions d’un français</span>
+                                                </div>
+                                                <div class="w-1/6 px-2 pb-3 border-l border-solid border-white-verydark font-medium">
+                                                    <span class="text-primary text-base font-bold">{{ getPercent(statSupport, total) }}</span>%
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="py-2.5 px-4 bg-primary text-white rounded-lg">
+                                        <div class="flex flex-row flex-nowrap items-stretch text-2xs">
+                                            <div class="w-2/6 px-2 pt-0.5 font-bold text-xs">Total</div>
+                                            <div class="w-3/6 px-2 font-medium">
+                                                <span class="text-base">{{ total }}</span>
+                                                kgéqCO₂
+                                                <span class="text-base">{{ toTons(total) }}</span>
+                                                téqCO₂
+                                                <span class="italic">(3)</span><br>
+                                                <span class="italic">soit
+													{{ toKmVoiture(toTons(total)) }}
+													km en voiture (1)</span><br>
+                                                <span class="italic">soit
+													{{ toAnneesEmissionFr(toTons(total)) }}
+													années d’émissions d’un français (2)</span>
+                                            </div>
+                                            <div class="w-1/6 px-2 font-medium"></div>
+                                        </div>
+                                    </div>
+
+                                    {% if contacts is defined %}
+                                        <div class="py-2.5 px-4 bg-grey-blue text-white rounded-lg mt-4">
+                                            <div class="flex flex-row flex-nowrap items-stretch text-2xs">
+                                                <div class="w-2/6 px-2 pt-0.5 text-xs">
+                                                    Emissions
+                                                    <br/>
+                                                    carbones
+                                                    <br/>
+                                                    par contact
+                                                </div>
+
+                                                <div class="w-4/6 px-2 font-medium">
+                                                    <ul class="list-circle">
+                                                        <li>
+                                                            {% if contacts[key] is defined and contacts[key].contacts > 0 %}
+                                                                Nombre de contact : {{ contacts[key].contacts }}
+                                                                <br/>
+                                                                Emissions carbones par contact :
+                                                                <br/>
+                                                                {{ contacts[key].contacts > 0 ? (toGrams(total) / contacts[key].contacts)|round(2) : 0 }} g CO₂ éq / contact
+                                                            {% else %}
+                                                                Nombre de contact : Champ non renseigné
+                                                            {% endif %}
+                                                        </li>
+
+                                                        <li>
+                                                            {% if contacts[key] is defined and contacts[key].contacts_unique > 0 %}
+                                                                Nombre de contact unique : {{ contacts[key].contacts_unique }}
+                                                                <br/>
+                                                                Emissions carbones par contact unique :
+                                                                <br/>
+                                                                {{ contacts[key].contacts_unique > 0 ? (toGrams(total) / contacts[key].contacts_unique)|round(2) : 0 }} g CO₂ éq / contact
+                                                            {% else %}
+                                                                Nombre de contact unique : Champ non renseigné
+                                                            {% endif %}
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div class="font-medium">
+                        (1) <span class="italic">Equivalence calculée sur la base de la moyenne des émissions de CO₂ du parc automobile français. Source : IFP</span><br>
+                        (2) <span class="italic">Source : ADEME : "1 français émet en moyenne 8,75 t/co² par an."</span><br>
+                        (3) <span class="italic">Empreinte carbone arrondie à la tonne supérieure</span><br>
+                    </div>
+                </div>
+            </div>
+            <div id="stats" class="col-span-4 grid grid-cols-4 gap-x-8">
+                <div class="col-span-full">
+                    <div class="box-shadow rounded-lg mb-8 overflow-hidden">
+                        <div class="bg-primary text-white p-7 text-center">
+                            {% set subTotals = [] %}
+                            {% for stat in statistics %}
+                                {% set subTotal = getTotal(stat) %}
+                                {% set subTotals = subTotals|merge([subTotal]) %}
+                            {% endfor %}
+                            <div class="text-13xl leading-none font-medium">{{ toTons(getTotal(subTotals)) }}</div>
+                            <div class="text-xs">tonnes equi. CO₂</div>
+                        </div>
+                        <div class="bg-white py-8 px-7 text-xs">
+                            <p>
+                                Vous venez d’évaluer l’empreinte carbone de vos campagnes de communication.<br>
+                                {#                            <strong>Découvrez les conseils de Bilobay pour la réduire !</strong> #}
+                            </p>
+                            {#                        <div class="flex justify-center items-center"> #}
+                            {#                            <a href="" class="btn btn--primary btn--little mt-7"> #}
+                            {#                                Nos conseils #}
+                            {#                            </a> #}
+                            {#                        </div> #}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+</div>

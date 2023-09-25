@@ -1,0 +1,94 @@
+{% import "front/macros/stats.html.twig" as STATS %}
+
+<section class="col-span-full">
+    <div class="flex flex-nowrap flex-row justify-start items-center mb-2">
+        <div class="relative px-7">
+            <h2>Statistiques</h2>
+        </div>
+        <div class="bg-white-verydark h-px flex-1"></div>
+    </div>
+    <div x-data="homeStats" id="dashboard-stats">
+        <div id="filters" class="flex flex-col flex-wrap xl:flex-row xl:justify-between items-start xl:items-end">
+            <div class="flex flex-row flex-wrap justify-start items-start">
+                <template x-if="organisms.length > 1">
+                    <div class="mr-4 mb-4 xl:mb-7">
+                        <label for="organism" class="font-medium my-4 block">Organisation</label>
+                        <div class="filter-input">
+                            <template x-if="organisms.length > 0">
+                                <select @change="changeFilter($event.target)" :disabled="organisms.length === 1 && 'disabled'" name="organism" id="organism" class="text-xs rounded-xl bg-white font-light w-48">
+                                    <option value="all" :selected="organisms.length > 1 && 'selected'">Toutes les organisations</option>
+                                    <template x-for="organism in organisms">
+                                        <option :value="organism.id" x-text="organism.name" :selected="organisms.length === 1 && 'selected'"></option>
+                                    </template>
+                                </select>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+                <template x-if="availableKeywords && Object.keys(availableKeywords).length > 0">
+                    <div class="mr-4 mb-4 xl:mb-7">
+                        <label for="keyword" class="font-medium my-4 block">Critère</label>
+                        <div class="filter-input">
+                            <select @change="changeFilter($event.target)" name="keyword" id="keyword" class="text-xs rounded-xl bg-white font-light w-48">
+                                <option value="all" :selected="Object.keys(availableKeywords).length > 1 && 'selected'">Tous les critères</option>
+                                <template x-for="[key, value] in Object.entries(availableKeywords)" :key="key">
+                                    <optgroup :label="value.label">
+                                        <template x-for="word in value.words">
+                                            <option :data-label="key" :value="word" x-text="word"></option>
+                                        </template>
+                                    </optgroup>
+                                </template>
+                            </select>
+                        </div>
+                    </div>
+                </template>
+                <template x-if="countries && Object.keys(countries).length > 0">
+                    <div class="mr-4 mb-4 xl:mb-7">
+                        <label for="country" class="font-medium my-4 block">Pays</label>
+                        <div class="filter-input">
+                            <select @change="changeFilter($event.target)" :disabled="Object.keys(countries).length === 1 && 'disabled'" name="country" id="country" class="text-xs rounded-xl bg-white font-light w-48">
+                                <option value="all" :selected="Object.keys(countries).length > 1 && 'selected'">Tous les pays</option>
+                                <template x-for="[key, value] in Object.entries(countries)" :key="key">
+                                    <option :value="key" x-text="value" :selected="Object.keys(countries).length === 1 && 'selected'"></option>
+                                </template>
+                            </select>
+                        </div>
+                    </div>
+                </template>
+                <div class="mr-2 mb-4 xl:mb-7">
+                    <label for="date" class="font-medium my-4 block">Période</label>
+                    <div class="flex items-center justify-start">
+                        <div class="filter-input flex items-center justify-start">
+                            <label for="dateStart">De</label>
+                            <input @focusout="changeFilter($event.target)" type="date" name="dateStart" id="dateStart" :value="dateStart" class="text-xs rounded-xl bg-white font-light w-40 ml-3">
+                        </div>
+                        <div class="filter-input flex items-center justify-start ml-3">
+                            <label for="dateEnd">à</label>
+                            <input @focusout="changeFilter($event.target)" type="date" name="dateEnd" id="dateEnd" :value="dateEnd" class="text-xs rounded-xl bg-white font-light w-40 ml-3">
+                        </div>
+                    </div>
+                </div>
+            </div>
+{#            <div class="flex flex-row justify-end items-center flex-nowrap mb-7 w-full xl:w-auto">#}
+{#                <a href="#" class="btn btn--primary min-w-0 my-0">Exporter</a>#}
+{#                <a href="#" class="btn btn--primary min-w-0 my-0 ml-4">Partager</a>#}
+{#            </div>#}
+        </div>
+        <div class="grid grid-cols-12 gap-6 2xl:gap-8">
+            <div class="box-shadow row-auto col-span-8 bg-white p-6 rounded-lg relative">
+                <template x-if="isLoading">
+                    <div class="loader">
+                        <img src="{{asset('media/pictos/loader.gif')}}" alt="">
+                    </div>
+                </template>
+                <h4 class="font-black text-base leading-none">Mes statistiques médias</h4>
+                <h5 class="text-xs">Statistique par type de média</h5>
+                <div class="text-2xs">tonnes CO₂ eq</div>
+                <div class="home__graph-container">
+                    <canvas id="dashboard-bar-graph" class="mt-4 pb-4" height="240" @loaded="displayBarGraph($event)"></canvas>
+                </div>
+            </div>
+            {{ STATS.createStats(null, 'dashboard', 2, 'relative')}}
+        </div>
+    </div>
+</section>

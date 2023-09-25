@@ -1,0 +1,100 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Facteur d'émission > Fiche de détail{% endblock %}
+
+{% block body %}
+    {% set rate = app.request.get('rate') %}
+    <h1 class="text-3xl text-black pb-6">Facteur d'émission > Fiche de détail</h1>
+    <div class="my-5 border rounded bg-white shadow">
+        <div class="grid grid-cols-2 px-3 py-3">
+           <h3><i class="fas mr-3 fa-square-root-alt"></i> {{ rate.getCompleteLabel() }}</h3> 
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2">
+            <div class="border-t">
+                <span class="p-3 border border-t-0 border-l-0 m-0 inline-block font-bold bg-violet-200">Informations</span>
+                <div class="px-6 py-3">
+                    {% form_theme formRate 'back/forms/main.html.twig' %}
+                    {{ form_start(formRate) }}
+                        <div class="my-2.5 mb-5">
+                            <div class="flex flex-row flex-nowrap justify-start items-center mb-2.5">
+                                <label class="text-xs">Chemin complet</label>
+                            </div>                
+                            <input type="text" required="required" class="block bg-white-dark rounded-lg text-xs font-light px-5 h-9 readonly:opacity-30 w-full" value="{{ rate.getCompleteName() }}" readonly>
+                        </div>
+                        {% for children in formRate.children %}
+                            {{ form_row(children) }}
+                        {% endfor %}
+                        <input type="submit" class="align-middle px-5 py-2 rounded-full font-semibold text-white border border-radius-10 bg-violet-500 hover:bg-violet-600" value="Mettre à jour les informations">               
+                    {{ form_end(formRate) }}
+                </div>
+            </div>
+            <div class="border-t border-l">
+                <span class="p-3 border border-t-0 border-l-0 m-0 inline-block font-bold bg-emerald-200">Valeur</span>
+                <div class="px-6 py-3">
+                    {% form_theme formValue 'back/forms/main.html.twig' %}
+                    {{ form_start(formValue, { 'attr' : { 'class' : 'flex' } }) }}
+                        <div class="w-60 mr-5">
+                            {{ form_widget(formValue) }}
+                        </div>
+                        <input type="submit" class="align-middle px-5 py-2 rounded-full font-semibold text-white border border-radius-10 bg-emerald-500 hover:bg-emerald-600" value="Mettre à jour la valeur">               
+                    {{ form_end(formValue) }}
+                    {{ form_errors(formValue) }}
+                    <div class="mt-10">
+                        <table class="mt-3 w-full border-collapse">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="border p-3" colspan="2">Historique des valeurs</th>
+                                </tr>
+                                <tr>
+                                    <th class="border p-3">Date</th>
+                                    <th class="border p-3">Valeur</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for value in rate.values|reverse %}
+                                    <tr>
+                                        <td class="border p-3">{{ value.dateCreation|date('d/m/Y à H:i') }}</td>
+                                        <td class="border p-3">{{ value.value }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2">
+            <div class="border-t">
+                <span class="p-3 border border-t-0 border-l-0 m-0 inline-block font-bold bg-yellow-200">Alerte</span>
+                <div class="px-6 py-3">
+                    {% form_theme formAlert 'back/forms/main.html.twig' %}
+                    {{ form_start(formAlert) }}
+                        {{ form_row(formAlert.dateAlert) }}
+                        <input type="submit" class="align-middle px-5 py-2 rounded-full font-semibold text-white border border-radius-10 bg-yellow-500 hover:bg-yellow-600" value="Mettre à jour la date">               
+                    {{ form_end(formAlert) }}
+                </div>
+            </div>  
+            <div class="border-t border-l">
+                <span class="p-3 border border-t-0 border-l-0 m-0 inline-block font-bold bg-cyan-200">Historique des mises à jour</span>
+                <div class="px-6 py-3">
+                        <table class="mt-3 w-full border-collapse">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="border p-3">Date</th>
+                                    <th class="border p-3">Utilisateur</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for h in rate.history|reverse %}
+                                    <tr>
+                                        <td class="border p-3">{{ h.datetime }}</td>
+                                        <td class="border p-3">{{ h.user }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                </div>  
+            </div>   
+        </div>
+    </div>
+{% endblock %}

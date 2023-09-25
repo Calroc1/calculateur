@@ -1,0 +1,151 @@
+{% extends 'front/base.html.twig' %}
+{% import "front/macros/stats.html.twig" as STATS %}
+
+{% block title %}Modifier une campagne
+{% endblock %}
+
+{% block body %}
+	<section class="col-span-full mt-6 lg:mt-14 h-10">
+		<h1 class="text-3xl font-medium leading-extra-loose w-full text-grey-light">
+			Gérer mes campagnes<span class="font-normal mx-4">|</span>
+			<span class="font-normal text-black">{{ campaign.truncatedName }}</span>
+		</h1>
+	</section>
+	<div x-data="form" x-init="setup({{ campaign.id }})" class="col-span-full grid grid-cols-6 lg:grid-cols-12 lg:gap-x-8 gap-y-12 lg:gap-y-8">
+	{% set userIsNotGuest = app.user.status != 'GUEST' ? 'true' : 'false' %}
+	{% set showSaveButton = "typeof currentStep !== 'undefined' && currentStep.name !== 'bilan' && (currentStep.name !== 'informations' || #{userIsNotGuest})" %}
+		<div class="col-span-full lg:col-span-8">
+			<div class="grid lg:gap-x-8 gap-y-12 lg:gap-y-8">
+				<section class="col-span-full">
+					<div class="flex flex-nowrap flex-row justify-between items-center pl-5">
+						<div x-data="dropdown" @mouseenter="open = true" @mouseleave="open = false" class="relative flex-1 py-3">
+							<div class="font-black relative flex flex-nowrap flex-row justify-start items-center xl:w-max max-w-full cursor-pointer">
+								<h2 class="text-secondary uppercase mr-3.5 mb-2 leading-none font-normal" x-text="currentStep ? currentStep.label : ''"></h2>
+								<div :class="{'-rotate-45': open, '-translate-y-1': !open}" class="transition transform rotate-45 border-secondary border-solid border-2 border-t-0 border-l-0 w-3 h-3"></div>
+								<ul x-cloak x-show="open" @click.outside="open = false" class="bg-white box-shadow absolute top-0 left-full ml-4 z-20 rounded-lg w-80 overflow-hidden">
+									<template x-for="step in allSteps" :key="step.name">
+										<li x-show="campaignSteps.includes(step.name)" @click="canGoTo(step); open = false">
+											<span :class="step === currentStep && 'bg-black text-white'" class="font-normal block p-3 transition hover:bg-black hover:text-white" x-text="step.label"></span>
+										</li>
+									</template>z
+								</ul>
+							</div>
+							<div class="w-full h-1 rounded-full bg-white-verydark absolute top-full left-0 overflow-hidden">
+								<div id="progressbar" class="relative w-full h-full bg-secondary rounded-full transform -translate-x-full transition-transform duration-300"></div>
+							</div>
+						</div>
+						<button x-show="{{showSaveButton}}" @click="postForm" type="submit" class="btn btn--primary my-0 ml-10">Sauvegarder</button>
+					</div>
+				</section>
+				<section class="col-span-full flex flex-col justify-start items-end min-w-0">
+					<div x-show="isInteractive" class="flex flex-nowrap flex-row justify-end items-center">
+						<div x-cloak @click="canGoTo('prev')" :class="getStepID() == 0 && 'invisible'" class="step mr-2.5 cursor-pointer">
+							{{ includeSVG('arrow-left.svg') }}
+						</div>
+						<span class="mr-2.5 font-bold text-grey-light">Page</span>
+						<div>
+							<input @change="canGoTo(parseInt($event.target.value))" :value="getStepID() + 1" :max="campaignSteps.length" min="1" type="number" class="rounded-lg text-center py-1.5 bg-white w-8">
+							<span class="mx-2">/</span>
+							<span x-text="campaignSteps.length"></span>
+						</div>
+						<div x-cloak @click="canGoTo('next')" :class="getStepID() == campaignSteps.length -1 && 'invisible'" class="step ml-2.5 cursor-pointer">
+							{{ includeSVG('arrow-right.svg') }}
+						</div>
+					</div>
+					<div class="bg-white px-6 py-4 rounded-lg w-full my-10 relative">
+						<div class="tabs-campaign">
+							<template x-for="(variant, id) in campaignVariants" :key="id">
+								<div :id="'variant-' + variant.id" x-data="dropdown" :data-variant="variant.id" @click="variantController('redirect', variant.id)" class="tab " :class="{'open-modal': open, 'border-green': variant.isMaster, 'border-yellow': !variant.isMaster, 'active': variant.id === currentVariant}">
+									<span class="variant__name" x-text="variant.name"></span>
+									<div class="modify" @click.stop>
+										<div @click="toggle" class="icon" :class="open && 'open-modal'">
+											{{ includeSVG('pen.svg') }}
+										</div>
+										<div x-cloak x-show="open" @click.outside="open = false" class="modal modal-rename">
+											<div class="flex flex-row flex-nowrap justify-start items-stretch">
+												<div class="rounded-lg overflow-hidden flex flex-nowrap items-stretch justify-start">
+													<input name="nom-campagne" placeholder="Entrez un nom" class="variant__input block bg-white-dark px-5 py-2.5 text-xs font-light flex-1 outline-none w-36">
+													<button type="submit" class="w-9 flex justify-center items-center bg-primary transition hover:bg-secondary outline-none" @click="variantController('rename', variant.id)">
+														{{ includeSVG('check.svg') }}
+													</button>
+												</div>
+												<button x-show="!variant.isMaster" class="ml-2.5 flex justify-center items-center delete icon" @click="variantController('delete', variant.id)">
+													{{ includeSVG('btn-trash.svg') }}
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</template>
+							<template x-if="campaignVariants.length < 3">
+								<div x-data="dropdown" class="add">
+									<div @click="toggle" :class="open && 'open-modal'" class="icon">
+										{{ includeSVG('add.svg') }}
+									</div>
+									<div x-data="{ duplicate : false }" x-cloak x-show="open" @click.outside="open = false" class="modal modal-rename">
+										{% if is_granted('campaign_add') %}
+											<div class="flex flex-row flex-nowrap justify-start items-center">
+												<div @click="duplicate = false" class="input-radio">
+													<input x-bind:checked="!duplicate" type="radio" name="duplicate-campain" id="duplicate-yes">
+													<label for="duplicate-yes">nouveau</label>
+												</div>
+												<div @click="duplicate = true" class="input-radio">
+													<input x-bind:checked="duplicate" type="radio" name="duplicate-campain" id="duplicate-no">
+													<label for="duplicate-no">dupliquer</label>
+												</div>
+											</div>
+										{% endif %}
+										<div class="mt-2.5 rounded-lg overflow-hidden flex flex-nowrap items-stretch justify-start">
+											<input title="Nom du variant" placeholder="Entrer un nom" class="name__new_variant block bg-white-dark px-5 py-2.5 text-xs font-light flex-1 outline-none w-36">
+											<button @click="duplicate ? variantController('duplicate') : variantController('create')" class="w-9 flex justify-center items-center bg-primary transition hover:bg-secondary outline-none">
+												{{ includeSVG('check.svg') }}
+											</button>
+										</div>
+									</div>
+								</div>
+							</template>
+						</div>
+						<template x-if="isLoading">
+							<img class="mx-auto my-20" src="{{asset('media/pictos/loader.gif')}}" alt="">
+						</template>
+						<template x-if="!isLoading">
+							<div x-data id="step-container" x-init="displayStep($el)"></div>
+						</template>
+					</div>
+					<div x-show="isInteractive" class="flex flex-nowrap flex-row justify-end items-center">
+						<div class="flex flex-nowrap flex-row justify-end items-center">
+							<div x-cloak @click="canGoTo('prev')" :class="getStepID() == 0 && 'invisible'" class="step mr-8 transition hover:text-secondary flex flex-row flex-nowrap justify-start items-center cursor-pointer">
+								{{ includeSVG('arrow-left.svg') }}
+								<span class="ml-2.5 font-bold">Page précédente</span>
+							</div>
+							<span class="mr-2.5 font-bold text-grey-light">Page</span>
+							<div>
+								<input @change="canGoTo(parseInt($event.target.value))" :value="getStepID() + 1" :max="campaignSteps.length" min="1" type="number" class="rounded-lg text-center py-1.5 bg-white w-8">
+								<span class="mx-2">/</span>
+								<span x-text="campaignSteps.length"></span>
+							</div>
+							<div x-cloak @click="canGoTo('next')" :class="getStepID() == campaignSteps.length -1 && 'invisible'" class="step ml-8 transition hover:text-secondary flex flex-row flex-nowrap justify-start items-center cursor-pointer">
+								<span class="mr-2.5 font-bold">Page suivante</span>
+								{{ includeSVG('arrow-right.svg') }}
+							</div>
+						</div>
+						<button x-show="{{showSaveButton}}" @click="postForm" type="submit" class="btn btn--primary my-0 ml-10">Sauvegarder</button>
+					</div>
+				</section>
+			</div>
+		</div>
+		{{ STATS.createStats(campaign) }}
+	</div>
+{% endblock %}
+
+{% block javascripts %}
+	<script>
+		window.allSteps = {{ getEnabledSupports()|serialize('support:view')|raw }};
+		window.virtualSteps = [];		
+		window.campaignSteps = {{ campaign.getVariantByIndex(app.request.get('variantIndex')).getSupportsNames()|json_encode|raw }};
+		window.currentVariant = {{ app.request.get('variantIndex') }};
+		window.campaignVariants = {{ campaign.getVariantsList|json_encode|raw }};
+		window.startStep = '{{ app.request.query.get('step') }}';
+	</script>
+	{{ parent() }}
+{% endblock %}

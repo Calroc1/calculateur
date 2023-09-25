@@ -1,0 +1,31 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Analyses{% endblock %}
+
+{% block body %}
+        <section class="col-span-full mt-6 lg:mt-14">
+                <h1 class="text-3xl font-bold leading-extra-loose w-full">Analyses</h1>
+        </section>
+        <section class="col-span-full lg:col-span-9 grid grid-cols-8 lg:gap-x-8 gap-y-12 lg:gap-y-8">
+                <div class="rounded-lg col-span-4 bg-white px-6 py-10 flex flex-col">
+                        <h2 class="text-center">Analyse Cumulative</h2>
+                        <div class="mt-7">
+                                <strong>L'analyse Cumulative</strong> vous permet de créer des Méta-campagnes en vous basant sur les campagnes existantes.<br>
+                                En jouant sur les critères de noms, de pays, de dates...vous pouvez analyser vos émissions cumulées de manière plus précise.
+                        </div>
+                        <div class="pt-8 mt-auto mb-0 text-center">
+                                <a href="{{ path('front_statistic_cumulative') }}" class="btn btn--primary btn--little">C'est parti</a>
+                        </div>
+                </div>
+                <div class="rounded-lg col-span-4 bg-white px-6 py-10 flex flex-col">
+                        <h2 class="text-center">Analyse Comparative</h2>
+                        <div class="mt-7">
+                                <strong>L'Analyse comparative</strong> vous permet d'afficher côte-à-côte jusqu'à 3 campagnes pour analyser les rapports détaillés.<br>
+                                Cette fonction vous permet par exemple de comprendre et de valoriser les efforts réalisés.
+                        </div>
+                        <div class="pt-8 mt-auto mb-0 text-center">
+                                <a href="{{ path('front_statistic_comparative') }}" class="btn btn--primary btn--little">C'est parti</a>
+                        </div>
+                </div>
+        </section>
+{% endblock %}

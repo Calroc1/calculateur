@@ -1,0 +1,88 @@
+{% form_theme form 'front/forms/main.html.twig' %}
+{{ form_start(form, { 'attr' : { 'id' : 'form-campaign' } }) }}
+    {% if form.organism is defined %}
+        {{ form_row(form.organism, { 'w' : 'lg:w-1/2'}) }}
+    {% endif %}
+    {{ form_row(form.name, { 'w' : 'w-full'}) }}
+    {{ form_row(form.dateStart, { 'w' : 'w-30'}) }}
+    {{ form_row(form.dateEnd, { 'w' : 'w-30'}) }}
+    {{ form_row(form.country, { 'w' : 'lg:w-1/2'}) }}   
+    {% if form.tags is defined %}
+        {{ form_label(form.tags) }}
+        {% if form.tags is not empty %}
+            {% for type in form.tags %}
+                <div class="flex flex-row flex-nowrap justify-start items-center">
+                    <label class="text-xs mr-3 mb-2.5">{{ type.vars.label }}</label>
+                    {{ form_widget(type) }}
+                </div>
+            {% endfor %}
+        {% else %}
+            <i>Aucun critère existant.</i>
+            {% do form.tags.setRendered %}
+        {% endif %}
+     {% endif %}
+     {{ form_row(form.phases) }}
+    <div class="my-2.5 mb-5">      
+        {{ form_label(form.steps) }}
+        <div class="overflow-x-scroll">
+            <table class="table-steps text-xs" cellpadding="8">
+                <thead>
+                    <tr>
+                        <th></th>
+                        {% for type in support_types %}
+                            <th>{{ type.name }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>                
+                    {% for referential in form.steps.children %}
+                        <tr>
+                            <td><b>{{ referential.vars.label }}</b></td>
+                            {% for type in support_types %}
+                                <td class="text-center">
+                                    {% if referential.children[type.safeName] is defined %}
+                                        {% for cc in referential.children[type.safeName].children %}
+                                            {{ form_row(cc) }}                         
+                                        {% endfor %}       
+                                    {% endif %}
+                                </td>
+                            {% endfor %}                  
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% do form.steps.setRendered %}
+        {#<div class="flex flex-row flex-wrap justify-start items-center">
+            <div class="input-radio">
+                <input type="checkbox" id="check-all-steps">
+                <label for="check-all-steps">Tout</label>
+            </div>
+            {% for c in form.steps.children %}
+                {{ form_row(c) }}
+            {% endfor %}
+            {% do form.steps.setRendered %}
+        </div>#}
+    </div>
+    {% if form.duplication is defined %}
+        {{ form_row(form.duplication) }}
+    {% endif %}
+
+    {{ form_row(form.hasNotionMediaEfficiency, { 'w' : 'w-full'}) }}
+
+    <div class="flex flex-row justify-start items-start">
+        {% if form.notionBudget is defined %}
+            {{ form_row(form.notionBudget, { 'w' : 'w-full'}) }}
+        {% endif %}
+
+        {% if form.budget is defined %}
+            <div class="mt-11 ml-5 w-3/5 flex flex-row justify-start items-center">
+                {{ form_widget(form.budget, { 'w' : 'w-full'}) }}
+
+                <span class="text-primary text-xs ml-2 w-1/5 text-center">Euros (HT)</span>
+            </div>
+        {% endif %}
+    </div>
+
+    <input type="submit" class="hidden">
+{{ form_end(form) }}

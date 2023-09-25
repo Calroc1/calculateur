@@ -1,0 +1,11 @@
+{% form_theme form 'back/forms/main.html.twig' %}
+{{ form_start(form, { attr: {'novalidate': 'novalidate' } }) }}
+    {{ form_row(form.name) }}  
+    {{ form_row(form.email) }}  
+    {{ form_row(form.phone) }}    
+    {{ form_row(form.address) }}    
+    {{ form_row(form.postalCode) }}    
+    {{ form_row(form.city) }}    
+    {{ form_row(form.country) }}    
+    <input type="submit" class="align-middle mt-5 px-5 py-2 rounded-full font-semibold text-white border border-radius-10 bg-cyan-500 hover:bg-cyan-600" value="Valider">
+{{ form_end(form) }}

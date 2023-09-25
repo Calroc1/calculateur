@@ -1,0 +1,59 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Facteurs d'émission > Liste{% endblock %}
+
+{% block body %}
+    <h1 class="text-3xl text-black pb-6">Facteurs d'émissions > Liste</h1>
+    {% for rate in rates %}
+        {{ _self.itemRate(rate, 0) }}
+    {% endfor %}
+{% endblock %}
+
+{% macro itemRate(rate, lvl) %}
+    {% set parent = rate.children|length %}
+    {% set bg = parent ? 'bg-white' : 'bg-violet-200' %}
+    <div class="my-5 border rounded {{ bg }}">        
+        <div class="grid grid-cols-2 px-3 py-3 border-b">
+            <div>
+                <h3>
+                    {% if parent == false %}<i class="fas mr-3 fa-square-root-alt"></i>{% endif %}
+                    {{ rate.label }}
+                </h3> 
+            </div>
+            <div class="text-right">
+                {% if parent == false %}
+                    <a href="{{ path('back_emission_update', { 'rate' : rate.id }) }}" class="align-middle px-5 py-2 text-sm rounded-full font-semibold text-white border border-radius-10 bg-violet-500 hover:bg-violet-600">Fiche de détail</a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="px-6 py-3">             
+            {% if parent > 0 %}
+                <strong>Chemin</strong> : {{ rate.getCompleteName() }}
+                {% for child in rate.children %}
+                    {{ _self.itemRate(child, (lvl+1)) }}
+                {% endfor %}
+            {% else %}
+                <strong>Chemin</strong> : {{ rate.getCompleteName() }}
+                <br/>
+                <strong>Valeur</strong> : {{ rate.getCurrentValue }}
+                <br/>
+                <strong>Unité</strong> : {{ rate.unit }}
+                <br/>
+                <strong>Dernière maj</strong> : {{ rate.dateUpdate|date('d/m/Y à H:i') }}
+            {% endif %}
+        </div>
+        {% if app.user.super %} 
+            <div class="grid grid-cols-2 px-3 py-3 border-t">
+                <div>
+                    <span class="p-1 border border-black bg-emerald-50">{{ rate.getCompleteName() }}</span>
+                </div>
+                <div class="text-right"></div>
+            </div>
+        {% endif %}
+        {#{{ rate.getCurrentValue }} / <span class="text-primary">{{ rate.unit }}</span></div>
+        <div class="flex flex-col justify-start items-start ml-auto mr-0">
+            <span>Evolution de <span class="text-primary">x%</span></span>
+            <a href="" class="btn btn--secondary mt-2">Fiche de détail</a>
+        </div>#}
+    </div>
+{% endmacro %}

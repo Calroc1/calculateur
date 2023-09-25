@@ -1,0 +1,7 @@
+{% form_theme form 'back/forms/main.html.twig' %}
+{{ form_start(form, { attr: {'novalidate': 'novalidate' } }) }}
+    <div>
+        {{ form_row(form.name) }}  
+    </div>
+    <input type="submit" class="align-middle mt-2 px-5 py-2 rounded-full font-semibold text-white border border-radius-10 bg-cyan-500 hover:bg-cyan-600" value="Valider">
+{{ form_end(form) }}

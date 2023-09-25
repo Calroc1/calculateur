@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+		<meta name="format-detection" content="telephone=no">
+		<title>
+			BILOBAY ||
+			{% block title %}{% endblock %}
+		</title>
+		
+		{% if bugherd_key %}
+			<script type="text/javascript" src="https://www.bugherd.com/sidebarv2.js?apikey={{ bugherd_key }}" async="true"></script>
+		{% endif %}
+
+		{% block stylesheets %}
+			{{ encore_entry_link_tags('vendor_css') }}
+			{{ encore_entry_link_tags('app_css') }}
+		{% endblock %}
+
+		{% block javascripts %}
+			{{ encore_entry_script_tags('app') }}
+			<script src="{{ asset('bundles/fosjsrouting/js/router.min.js') }}"></script>
+			<script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
+		{% endblock %}
+	</head>
+	<body class="min-w-full min-h-screen w-auto h-auto">
+		<div class="absolute top-0 left-0 w-full h-full flex justify-center items-center lg:hidden">
+			<img src="{{ asset('media/images/mobile_screen_bg.jpg') }}" alt="Background mobile" class="absolute top-0 left-0 w-full h-full object-cover z-0">
+			<img src="{{ asset('media/images/mobile_screen.svg') }}" alt="Logo mobile" class="relative z-10">
+		</div>
+		{% if block('body_security') is defined %}
+			<div class="container p-6 min-w-full min-h-screen justify-center items-center relative hidden lg:flex">
+				<div class="absolute top-0 left-0 w-full h-full z-0">
+					<img src="{{ asset('media/images/background-login.jpg') }}" alt="Background login" class="absolute top-0 left-0 w-full h-full object-cover">
+				</div>
+				<div id="modal-security" class="relative bg-white rounded-md overflow-hidden text-xs">
+					<div class="flex justify-center bg-primary py-10 px-6">
+						<img src="{{ asset('media/logos/login-title.svg') }}" alt="Logo login">
+					</div>
+					{% for message in app.flashes('security_success') %}
+						{{ showNotification(message, 'success', 'mx-4 mt-4') }}
+					{% endfor %}
+					{{ block('body_security') }}
+				</div>
+			</div>
+		{% else %}
+			<div class="main__container ml-auto mr-auto max-w-full min-h-screen h-auto hidden lg:block">
+				{% include "front/parts/_sidebar.html.twig" %}
+				{% include "front/parts/_header.html.twig" %}
+				<div class="grid grid-cols-6 lg:grid-cols-12 lg:gap-x-8 gap-y-12 lg:gap-y-8 mb-24">
+					{% for message in app.flashes('success') %}
+						{{ showNotification(message, 'success', 'col-span-full mt-4') }}
+					{% endfor %}
+					{% for message in app.flashes('error') %}
+						{{ showNotification(message, 'error', 'col-span-full mt-4') }}
+					{% endfor %}
+					{% block body %}{% endblock %}
+				</div>
+			</div>
+			<div class="grid place-items-center p-2">Copyright Bilobay - V2</div>
+		{% endif %}
+		<div x-data="modal">
+			<div x-cloak x-show="modalOpen" @click.self="closeModal()" @modal-trigger.window="openModal" class="fixed top-0 left-0 h-screen w-screen backdrop-blur-sm bg-black bg-opacity-20 z-50 flex justify-center items-center">
+				<div class="flex flex-col items-center justify-center py-4 px-6 rounded-lg shadow-lg bg-white w-max">
+					<p class="text-center" x-text="msg"></p>
+					<div class="w-full flex justify-center mt-4 gap-x-4" @click="handleModal">
+						<template x-for="(action, id) in actions" :key="id">
+							<button class="btn btn--modal" :class="action.class ?? 'btn--primary'" :data-action="id" x-text="action.name"></button>
+						</template>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+	</body>
+</html>

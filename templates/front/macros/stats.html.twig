@@ -1,0 +1,125 @@
+{% macro createStats(campaign, page = "campaign", width = '4', additionnalClasses = '') %}
+	<div id="stats" x-data="stats" @loaded="setup($event.detail)" class="col-span-{{width}} relative {{ additionnalClasses }}">
+		{# for dashboard ajax loading #}
+		{% if page == "dashboard" %}
+			<template x-if="isLoading">
+				<div class="loader">
+					<img src="{{asset('media/pictos/loader.gif')}}" alt="loader">
+				</div>
+			</template>
+		{% endif %}
+		<div class="sticky top-0 w-full" :class="typeof currentStep !== 'undefined' && currentStep.name !== 'bilan' ? 'lg:w-3/5 xl:w-2/4' : ''">
+			{% if page != "dashboard" %}<template x-if="typeof currentStep !== 'undefined' && currentStep.name !== 'bilan'">{% endif %}
+				<div class="box-shadow bg-white px-6 py-7 rounded-lg {% if page == "campaign" %}mt-3{% endif %}">
+					<h4 class="font-black text-base leading-none">Stats</h4>
+					<div class="text-2xs">tonnes CO₂ eq</div>
+					<ul class="stat">
+						<template x-for="(stepStats, name) in stats" :key="name">
+							<li class="mt-3" :class="'stat__' + name">
+								{{ _self.createDetailsStats() }}
+							</li>
+						</template>
+					</ul>
+				</div>
+			{% if page != "dashboard" %}</template>{% endif %}
+			<div class="box-shadow rounded-lg my-8 overflow-hidden">
+				<div class="bg-primary text-white py-7 text-center">
+					<div class="leading-none font-medium" :class="toTons(campaignTotal).toString().length > 3 && toTons(campaignTotal) > 1 ? 'text-5xl 2xl:text-9xl' : 'text-9xl 2xl:text-13xl'" x-text="toTons(campaignTotal)"></div>
+					<div class="text-xs">tonnes equi. CO₂</div>
+				</div>
+				<template x-if="typeof currentStep !== 'undefined' && currentStep.name === 'bilan'">
+					<div class="bg-white py-8 px-7 text-xs">
+						<p>
+							Vous venez d’évaluer l’empreinte carbone de votre campagne de communication.<br>
+							{#							<strong>Découvrez les conseils de Bilobay pour la réduire !</strong>#}
+						</p>
+						{#						<div class="flex justify-center items-center">#}
+						{#							<a href="" class="btn btn--primary btn--little mt-7">#}
+						{#								Nos conseils#}
+						{#							</a>#}
+						{#						</div>#}
+					</div>
+				</template>
+			</div>
+			{% if page == "campaign" %}
+				<template x-if="typeof currentStep !== 'undefined' && currentStep.name === 'bilan'">
+					<div>
+						{% if campaign.getVariantsList|length > 1 %}
+							<a href="{{ path('front_campaign_compare', {campaign: campaign.id}) }}" class="group w-full box-shadow bg-white hover:bg-opacity-50 transition duration-150 rounded-lg overflow-hidden flex justify-betwen items-center h-16 my-4">
+								<span class="flex-grow px-6 font-bold">Faire une comparaison</span>
+								<div class="w-16 h-full flex items-center justify-center bg-primary group-hover:bg-secondary transition duration-150">
+									{{ includeSVG('btn-devis.svg') }}
+								</div>
+							</a>
+						{% endif %}
+					</div>
+				</template>
+				<template x-if="typeof currentStep !== 'undefined' && currentStep.name !== 'bilan'">
+					<div>
+{#						<button class="group w-full box-shadow bg-white hover:bg-opacity-50 transition duration-150 rounded-lg overflow-hidden flex justify-betwen items-center h-12 my-4 text-left">#}
+{#							<span class="flex-grow px-6 text-base font-bold">Partager</span>#}
+{#							<span class="w-12 h-full flex items-center justify-center bg-primary group-hover:bg-secondary transition duration-150">#}
+{#								{{ includeSVG('btn-mail.svg') }}#}
+{#							</span>#}
+{#						</button>#}
+						{# GO TO LAST STEP BILAN #}
+						<button @click="canGoTo(allSteps[allSteps.length - 1])" class="group w-full box-shadow bg-white hover:bg-opacity-50 transition duration-150 rounded-lg overflow-hidden flex justify-betwen items-center h-12 my-4 text-left">
+							<span class="flex-grow px-6 text-base font-bold">Détails</span>
+							<span class="w-12 h-full flex items-center justify-center bg-primary group-hover:bg-secondary transition duration-150 text-white">
+								{{ includeSVG('btn-graph.svg') }}
+							</span>
+						</button>
+						{% if campaign.getVariantsList|length > 1 %}
+							<a href="{{ path('front_campaign_compare', {campaign: campaign.id}) }}" class="group w-full box-shadow bg-white hover:bg-opacity-50 transition duration-150 rounded-lg overflow-hidden flex justify-betwen items-center h-12 my-4 text-left">
+								<span class="flex-grow px-6 text-base font-bold">Comparer</span>
+								<span class="w-12 h-full flex items-center justify-center bg-primary group-hover:bg-secondary transition duration-150 text-white">
+									{{ includeSVG('btn-devis.svg') }}
+								</span>
+							</a>
+						{% endif %}
+					</div>
+				</template>
+			{% endif %}
+		</div>
+	</div>
+{% endmacro %}
+
+{% macro createDetailsStats() %}
+	<div x-data="dropdown" @click="if(!open) {toggle(); $nextTick(()=>drawGraph(name))} else {toggle()}" class="cursor-pointer">
+		<div class="text-2xs flex flex-row flex-nowrap justify-between items-end mb-2.5">
+			<div class="text-black" x-text="getStepProp(name, 'label')"></div>
+			<div x-text="toTons(getTotal(stepStats))"></div>
+		</div>
+		<div class="rounded-full bg-white-verydark w-full h-1 relative">
+			<div class="stat__line absolute top-0 left-0 h-full rounded-full" :style="styleNames({ width: getStatWidth(getTotal(stepStats), campaignTotal) })"></div>
+			<div class="absolute left-full ml-6" :class="Object.keys(stats).indexOf(name)+1 <= Math.round(Object.keys(stats).length/2)?'-top-3.5':'-bottom-3.5'">
+				<template x-if="typeof currentStep != 'undefined' && currentStep.name.includes(name)">
+					<div class="stat__pastille h-8 w-2 rounded-r-lg"></div>
+				</template>
+				<div x-show="open" @click.outside="toggle()" class="stat__details absolute z-10 left-0 box-shadow rounded-lg rounded-tl-none overflow-hidden bg-white cursor-auto" :class="Object.keys(stats).indexOf(name)+1 <= Math.round(Object.keys(stats).length/2)?'top-0':'bottom-0'">
+					<div class="header py-2 px-4 text-center leading-5 cursor-pointer">
+						<h4 class="text-base font-bold text-white w-full min-w-max" x-text="getStepProp(name, 'label')"></h4>
+					</div>
+					<div class="px-5 py-2" @click.stop>
+						<div class="text-center mb-2 font-medium text-sm leading-none text-black">
+							<span class="text-3xl font-bold" x-text="getTotal(stepStats)"></span>
+							kgéqCO₂
+						</div>
+						<canvas class="stat-details block my-2 ml-auto mr-auto" width="150" height="150"></canvas>
+						<template x-for="(stepStat, stepStatName, index) in stepStats" :key="stepStatName">
+							<div class="my-4">
+								<div class="text-2xs flex flex-row flex-nowrap justify-between items-end mb-2.5">
+									<div class="text-black mr-2" x-text="stepStatName"></div>
+									<div x-text="stepStat"></div>
+								</div>
+								<div class="rounded-full bg-white-verydark w-full h-1 relative">
+									<div class="stat__line absolute top-0 left-0 h-full rounded-full" :style="styleNames({ width: getStatWidth(stepStat, getTotal(stepStats)) })"></div>
+								</div>
+							</div>
+						</template>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endmacro %}

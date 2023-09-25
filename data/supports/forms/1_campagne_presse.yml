@@ -1,0 +1,136 @@
+name: campagne_presse
+label: Campagne presse
+color: '#D681EF'
+referential: Bilobay
+type: Presse
+children:
+- name: conception
+  phase: conception
+  label: Conception - création de la campagne
+  type: collection
+  unit: prestataire  
+  renamable: true
+  children:
+    - name: temps_interne
+      label: Temps de conception en interne
+      type: integer
+      unit: jours.homme
+      help: Ce poste regroupe les émissions fixes de l'activité (énergie, fret, déplacements
+        domicile-travail des salariés, déplacements des visiteurs, intrants, déchets,
+        amortissements)
+    - name: temps_externe
+      label: Temps passé des prestataires extérieurs (directeur artistique, consultant...),
+        basé sur la durée de leur prestation
+      type: integer
+      unit: jours.homme
+    - name: visio
+      label: Visio pour la conception
+      type: section
+      display: table
+      children:
+      - name: temps
+        label: Durée
+        type: integer
+        unit: heures
+      - name: participants
+        label: Nombre moyen de participants
+        type: integer
+    - name: deplacements
+      label: Déplacements clients-agence et agence-clients, prestataire-agence et
+        agence-prestataire ou régie-agence et agence-régie
+      type: section
+      display: table
+      percentage: true
+      children:
+      - name: voiture
+        label: En voiture
+        type: integer
+        unit: km
+      - name: avion
+        label: En avion
+        type: integer
+        unit: km
+      - name: train
+        label: En train
+        type: integer
+        unit: km
+    - name: hotel
+      label: Nuitées d’hotel
+      type: integer
+      unit: nuitées
+- name: shooting
+  phase: production
+  label: Shooting
+  type: collection
+  unit: shooting
+  default: entry
+  children:
+    - name: temps_externe
+      label: Temps passé pour le shooting des prestataires extérieurs (freelance,
+        photographe, mannequin...), basé sur la durée de leur prestation
+      type: integer
+      unit: jours.homme
+    - name: visio
+      label: Visio pour le shooting
+      type: section
+      display: table
+      children:
+      - name: temps
+        label: Durée
+        type: integer
+        unit: heures
+      - name: participants
+        label: Nombre moyen de participants
+        type: integer
+    - name: deplacements
+      label: Déplacements vers le lieu du shooting, prestataire-agence et agence-prestataire
+        ou régie-agence et agence-régie
+      type: section
+      display: table
+      percentage: true
+      children:
+      - name: voiture
+        label: En voiture
+        type: integer
+        unit: km
+      - name: avion
+        label: En avion
+        type: integer
+        unit: km
+      - name: train
+        label: En train
+        type: integer
+        unit: km
+    - name: hotel
+      label: Nuitées d’hotel
+      type: integer
+      unit: nuitées
+- name: impression_diffusion
+  phase: diffusion
+  label: Impression et diffusion
+  type: collection
+  unit: insertion
+  display: table
+  children:
+    - name: format
+      label: Format de l'insertion
+      type: select
+      choices:
+      - label: A6
+        value: A6
+      - label: A5
+        value: A5
+      - label: A4
+        value: A4
+      - label: A3
+        value: A3
+      - label: A2
+        value: A2
+      - label: A1
+        value: A1
+      - label: A0
+        value: A0
+    - name: tirage
+      label: Tirage du journal/magazine
+      type: integer
+      unit: unités

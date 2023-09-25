@@ -1,0 +1,23 @@
+{% extends 'emails/base.html.twig' %}
+
+{% block body %}
+    Bonjour,
+    <br/><br/>
+    Demande supplémentaire  :
+    <br/><br/>
+    <strong>Organisation</strong> : {{ variant.campaign.organism.name }}
+    <br/>
+    <strong>Campagne</strong> : {{ variant.campaign.name }}
+    <br/>
+    {% if variant.campaign.variants|length > 1 %}
+        <strong>Variante </strong> : {{ variant.name }}        
+        <br/>
+    {% endif %}
+    <strong>Nom de la demande</strong> : {{ request.title }}
+    <br/>
+    <strong>Message</strong> :
+    <br/>
+    {{ request.content|nl2br}}
+    <br/><br/>
+    Cordialement,
+{% endblock %}

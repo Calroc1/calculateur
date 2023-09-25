@@ -1,0 +1,88 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Détail du formulaire{% endblock %}
+
+{% block body %}
+    {% set support = app.request.get('support') %}
+    <h1 class="text-3xl text-black pb-6">Détail du formulaire</h1>
+    <div class="my-5 border rounded bg-white shadow">
+        <div class="grid grid-cols-2 px-3 py-3 border-b">
+            <div>
+                <h3><i class="fas mr-3 fa-calculator"></i>{{ support.label }} </h3> 
+            </div>
+            <div class="text-right">
+                <a href="{{ path('back_support_delete', { 'support' : support.id }) }}" class="align-middle px-5 py-2 text-sm rounded-full font-semibold text-white border border-radius-10 bg-red hover:bg-red">Supprimer</a>
+            </div>
+        </div>
+        <div class="border-t">
+            <span class="p-3 border border-t-0 border-l-0 m-0 inline-block font-bold bg-cyan-200">Informations</span>
+            <div class="px-6 py-3">
+                {% include 'back/support/_form.support.html.twig' with { 'form' : formSupport } %}    
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2">
+            <div class="border-t">
+                <span class="p-3 border border-t-0 border-l-0 m-0 inline-block font-bold bg-yellow-200">Structure</span>
+                <div class="px-6 py-3">
+                    {% form_theme formForm 'back/forms/main.html.twig' %}
+                    {{ form_start(formForm, { attr: {'novalidate': 'novalidate' } }) }}
+                        {{ form_row(formForm) }}
+                        <input type="submit" class="align-middle mt-5 px-5 py-2 rounded-full font-semibold text-white border border-radius-10 bg-yellow-500 hover:bg-yellow-600" value="Valider">
+                    {{ form_end(formForm) }}
+                    {% if support.dateUpdateForm  %}
+                        <div class="bg-yellow-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4" role="alert">
+                            La structure a été mise à jour le <strong class="font-bold">{{ support.dateUpdateForm|date('d/m/Y') }}</strong> à <strong class="font-bold">{{ support.dateUpdateForm|date('H:i') }}</strong></a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>  
+            <div class="border-t border-l">
+                <span class="p-3 border border-t-0 border-l-0 m-0 inline-block font-bold bg-emerald-200">Algorithme</span>
+                <div class="px-6 py-3">
+                    {% form_theme formAlgo 'back/forms/main.html.twig' %}
+                    {{ form_start(formAlgo, { attr: {'novalidate': 'novalidate' } }) }}
+                        {{ form_row(formAlgo) }}
+                        <input type="submit" class="align-middle mt-5 px-5 py-2 rounded-full font-semibold text-white border border-radius-10 bg-emerald-500 hover:bg-emerald-600" value="Valider">
+                    {{ form_end(formAlgo) }}
+                    {% if support.dateUpdateAlgorithm  %}
+                        <div class="bg-emerald-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4" role="alert">
+                            L'algorithme a été mis à jour le <strong class="font-bold">{{ support.dateUpdateAlgorithm|date('d/m/Y') }}</strong> à <strong class="font-bold">{{ support.dateUpdateAlgorithm|date('H:i') }}</strong></a>
+                        </div>
+                    {% endif %}
+                </div>  
+            </div>   
+        </div>
+    </div>
+    {% if support.formElements|length > 0 or support.formulas|length > 0 %}
+        <div class="my-5 border rounded bg-white shadow">
+            <div class="grid grid-cols-1 md:grid-cols-2">
+                <div>
+                    <div class="px-3 py-3 border-b">
+                        <h3></i>Prévisualisation</h3> 
+                    </div>
+                    <div class="p-5">                
+                        {% form_theme formPreview 'front/forms/campaign.html.twig' %}
+                        {{ form_start(formPreview, { 'attr' : { 'id' : 'form-campaign' , 'class' : 'demo-form' } }) }}
+                        {% for children in formPreview.children %}
+                            {{ form_row(children) }}
+                        {% endfor %}
+                        {{ form_end(formPreview) }}
+                    </div>
+                </div>
+                <div class="border-l">
+                    <div class="px-3 py-3 border-b">
+                        <h3></i>Récapitulatif algorithme</h3> 
+                    </div>
+                    <div class="p-5">   
+                        {% import 'back/support/algorithmic.twig' as algorithmic %}    
+                        {% for formula in support.formulas %}
+                            <div class="bg-emerald-100 border-2 border-emerald-300 rounded-lg my-2.5 tracking-wider">                                
+                                {{ algorithmic.formula(formula, support.getFormElementByPath(formula.path), 'emerald', true) }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Analyse cumulative{% endblock %}
+
+{% block javascripts %}
+    <script>
+        window.campaigns = {{ campaigns|serialize('stats')|raw }};
+        window.campaignsURL = {{ app.request.get('campaigns')|json_encode|raw }};
+        window.statuses = {{ getCampaignStatuses()|json_encode|raw }};
+        window.allSteps = Object.values({{ getEnabledSupports()|serialize('support:view')|raw }});
+    </script>
+    {{ parent() }}
+{% endblock %}
+
+{% block body %}
+    <section class="col-span-full mt-6 lg:mt-14">
+        <h1 class="text-3xl font-medium leading-extra-loose w-full text-grey-light">
+            Analyses<span class="font-normal mx-5">|</span><span class="font-bold text-black">Cumulative</span>
+        </h1>
+    </section>
+
+    {% include 'front/statistic/_stats_cumulative.html.twig' %}
+{% endblock %}

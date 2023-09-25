@@ -1,0 +1,22 @@
+{% macro createList(stats) %}
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-2 2xl:grid-cols-4 gap-x-6 gap-y-6">
+        {% for stat in stats %}
+            {% if stat.type == 'data' %}
+                <div class="stat stat--{{ stat.state.key }} col-span-1 row-span-1 col-start-{{ stat.start.col }} row-start-{{ stat.start.row }}
+                    flex flex-col items-center justify-center w-full rounded-lg bg-white shadow">
+                    <span class="mb-2 text-5xl lg:text-7xl">{{ stat.value }}</span>
+                    <p>document{{ stat.value > 1 ? 's' }}</p>
+                    <span class="font-bold">{{ stat.state.text }}</span>
+                </div>
+            {% elseif stat.type == 'graph' %}
+                <div class="stat relative col-span-2 row-span-2 flex flex-col items-center justify-center w-full rounded-lg overflow-hidden bg-white shadow">
+                    <img class="absolute w-full top-0 left-0" src="{{ asset('media/image/replace_graph_admin.PNG') }}"
+                         alt="à modifier">
+                    <span class="mb-2 text-7xl">6</span>
+                    <p>document</p>
+                    <span class="font-bold">Créés</span>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endmacro %}

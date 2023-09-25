@@ -1,0 +1,49 @@
+{% form_theme form 'front/forms/main.html.twig' %}
+{{ form_start(form, { attr: {'novalidate': 'novalidate', 'class' : 'col-span-8' } }) }}
+<section class="w-full mb-6">
+	<div class="flex flex-nowrap flex-row justify-between items-center pl-5">
+		<div class="relative flex-1 py-4">
+			<div class="font-black relative flex flex-nowrap flex-row justify-start items-center w-max max-w-full cursor-pointer">
+				<h3>Informations</h3>
+			</div>
+		</div>
+		{% if btn is defined and btn.pos == 'top' %}
+			<button type="submit" class="btn btn--primary my-0 ml-10">{{btn.text}}</button>
+		{% elseif not btn is defined %}
+			<button type="submit" class="btn btn--primary my-0 ml-10">Sauvegarder</button>
+		{% endif %}
+	</div>
+</section>
+<section class="w-full flex flex-col justify-start items-end">
+	<div class="bg-white px-6 py-4 rounded-lg w-full">
+		<div class="flex flex-wrap flex-row items-start">
+			{{ form_row(form.firstname, { 'row_attr' : { 'class' : 'w-full lg:w-1/2 lg:pr-4' } }) }}
+			{{ form_row(form.lastname, { 'row_attr' : { 'class' : 'w-full lg:w-1/2' } }) }}
+		</div>
+		<div class="flex flex-wrap flex-row items-start">
+			{{ form_row(form.email, { 'row_attr' : { 'class' : 'w-full lg:w-1/2 lg:pr-4' } }) }}
+			{{ form_row(form.phone, { 'row_attr' : { 'class' : 'w-full lg:w-1/2' } }) }}
+		</div>
+		{{ form_row(form.address) }}
+		<div class="flex flex-wrap flex-row items-start">
+			{{ form_row(form.city, { 'row_attr' : { 'class' : 'w-full lg:w-1/2 lg:pr-4' } }) }}
+			{{ form_row(form.postalCode, { 'row_attr' : { 'class' : 'w-full lg:w-1/2' } }) }}
+		</div>
+		{% if form.status is defined %}
+			{{ form_row(form.status) }}
+		{% endif %}
+		{% if form.organism is defined %}
+			{{ form_row(form.organism) }}
+		{% endif %}
+		{% if form.phases is defined %}
+			{{ form_row(form.phases) }}
+		{% endif %}
+		{% if form.invitation is defined %}
+			{{ form_row(form.invitation) }}
+		{% endif %}
+	</div>
+</section>
+{% if btn is defined and btn.pos == 'bottom' %}
+	<button type="submit" class="btn btn--primary mb-0 mt-8 block ml-auto mr-6">{{btn.text}}</button>
+{% endif %}
+{{ form_end(form) }}

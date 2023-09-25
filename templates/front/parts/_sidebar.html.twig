@@ -1,0 +1,64 @@
+<div id="sidebar-menu" class="sidebar__container hidden lg:block sticky z-20 top-0 left-0">
+	<div class="sidebar bg-primary flex flex-col items-start justify-start min-h-screen h-auto absolute top-0 left-0">
+		<a href="{{ path('front_home') }}" class="w-full flex justify-center items-center p-8">
+			<img src="{{ asset('media/logos/sidebar-logo.svg') }}" alt="Logo sidebar">
+		</a>
+		<div class="sidebar__content flex flex-col items-start justify-start w-full flex-1 relative box-shadow">
+			<div class="sidebar__content__bg absolute top-0 left-0 h-full w-full z-0 bg-white"></div>
+			{{ _self.itemSidebar({
+                    icon:'dashboard.svg',
+                    text: 'Tableau de bord',
+                    route : 'front_home',
+					activeRoutePrefixes : [
+						'front_home'
+					]
+                }) 
+            }}
+			{{ _self.itemSidebar({
+                    icon:'folder.svg',
+                    text: 'Gérer mes campagnes',
+                    route : 'front_campaign_home',
+					activeRoutePrefixes : [
+						'front_campaign'
+					]
+                }) 
+            }}
+			{% if is_granted('organism_view') %}
+				{{ _self.itemSidebar({
+                        icon:'collab.svg',
+                        text: 'Mon entreprise',
+                        route : 'front_organism_home',
+						activeRoutePrefixes : [
+							'front_organism' , 'front_user'
+						]
+                    }) 
+                }}
+			{% endif %}
+			{{ _self.itemSidebar({
+                    icon:'analytics.svg',
+                    text: 'Analyses',
+                    route : 'front_statistic_home',
+					activeRoutePrefixes : [
+						'front_statistic'
+					]
+                }) 
+            }}
+		</div>
+	</div>
+</div>
+
+{% macro itemSidebar(params) %}
+	{% set active = false %}
+	{% for prefix in params.activeRoutePrefixes %}
+		{% if active == false and app.request.get('_route') starts with prefix %}
+			{% set active = true %}
+		{% endif %}
+	{% endfor %}
+	<a class="sidebar__item w-full relative text-grey-light mb-2  {{ active ? 'sidebar__item--current' }}" href="{{ path(params.route) }}">
+		<span class="flex flex-col items-center justify-center relative z-10 w-full h-full px-8">
+			{{ includeSVG(params.icon) }}
+			<span class="text-center font-semibold mt-3 leading-tight text-xs">{{ params.text }}</span>
+		</span>
+		<span class="sidebar__item__highlight absolute h-full top-0 left-full rounded-r-lg bg-secondary"></span>
+	</a>
+{% endmacro %}

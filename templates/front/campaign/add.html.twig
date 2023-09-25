@@ -1,0 +1,75 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Créer une campagne{% endblock %}
+
+{% block body %}
+	<section class="col-span-full mt-6 lg:mt-14">
+		<h1 class="text-3xl font-medium leading-extra-loose w-full text-grey-light">
+			Gérer mes campagnes<span class="font-normal mx-6">|</span>
+			<span class="font-bold text-black">Nouvelle campagne</span>
+		</h1>
+	</section>
+	<div class="col-span-full grid grid-cols-6 lg:grid-cols-12 lg:gap-x-8 gap-y-12 lg:gap-y-8">
+		<div class="col-span-full lg:col-span-8">
+			<section class="col-span-full mb-20">
+				<div class="flex flex-nowrap flex-row justify-between items-center pl-5">
+					<div class="relative flex-1 py-3">
+						<div class="font-black relative flex flex-nowrap flex-row justify-start items-center w-max max-w-full cursor-pointer">
+							<h2 class="text-secondary uppercase mr-3.5 font-normal">Étape information campagne</h2>
+						</div>
+						<div class="w-full h-1 rounded-full bg-white-verydark absolute top-full left-0 overflow-hidden">
+							<div id="progressbar" class="relative w-full h-full bg-secondary rounded-full transform -translate-x-full transition-transform duration-300" style="transform: translate(-88.8889%)"></div>
+						</div>
+					</div>
+					<button form="form-campaign" type="submit" class="btn btn--primary my-0 ml-10">Créer la campagne</button>
+				</div>
+			</section>
+			<section x-data="initPlugin" x-init="loadPlugin('sfFormActions', [$el.querySelector('#form-campaign'), 'informations'])" class="col-span-full">
+				<div class="bg-white px-6 py-4 rounded-lg w-full">
+					{% if formDuplicate is defined %}
+						{% include 'front/campaign/_form.duplicate.html.twig' with { 'form' : formDuplicate } %}
+					{% else %}
+						{% include 'front/campaign/_form.informations.html.twig' with { 'form' : formAdd } %}
+					{% endif %}
+				</div>
+				<div class="flex flex-nowrap flex-row justify-end items-center mt-5">				
+					{% if formDuplicate is defined %}					
+						{% set campaignData = app.request.query.get('campaign')|filter((v, k) => k != 'duplication') %}
+						<a href="{{ path('front_campaign_add', { 'campaign' : campaignData }) }}" class="step mr-8 transition hover:text-secondary flex flex-row flex-nowrap justify-start items-center cursor-pointer mr-auto">
+							{{ includeSVG('arrow-left.svg') }}
+							<span class="ml-2.5 font-bold">Annuler</span>
+						</a>
+					{% endif %}
+					<button form="form-campaign" type="submit" class="btn btn--primary my-0 ml-16">Créer la campagne</button>
+				</div>
+			</section>
+		</div>
+		{#<div id="stats" class="col-span-4 grid grid-cols-5 xl:grid-cols-4 gap-x-8 mt-36">
+			<div class="col-span-full lg:col-span-3 xl:col-span-2">
+				<div class="box-shadow rounded-lg mb-8 overflow-hidden">
+					<div class="bg-primary text-white p-7 text-center">
+						<div class="text-9xl 2xl:text-13xl leading-none font-medium">0</div>
+						<div class="text-xs">tonnes equi. CO₂</div>
+					</div>
+				</div>
+				<div class="box-shadow bg-white px-6 py-7 rounded-lg">
+					<h4 class="font-black text-base leading-none">Stats</h4>
+					<div class="text-2xs">tonnes CO₂ eq</div>
+					<ul class="stat">
+						{% for support in getEnabledSupports() %}
+							<li class="mt-3 stat__{{ support.name }}">
+								<div class="text-2xs flex flex-row flex-nowrap justify-between items-end mb-2.5">
+									<div class="text-black">{{ support.label }}</div>
+									<div>0</div>
+								</div>
+								<div class="rounded-full bg-white-verydark w-full h-1 relative">
+									<div class="stat__line absolute top-0 left-0 h-full rounded-full" style="width:0"></div>
+								</div>
+							</li>
+						{% endfor %}
+					</ul>
+				</div>
+			</div>
+		</div>#}
+	</div>
+{% endblock %}

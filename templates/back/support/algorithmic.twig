@@ -1,0 +1,247 @@
+{% macro formula(formula, formElement, color, name) %}    
+    {% set color = color ? color : 'emerald' %}
+     {% if name %}
+        <div class="text-center border-b-2 border-{{color}}-300">
+            <span class="bg-lime-400 border border-black p-2 my-2 mx-1 rounded-lg inline-block">
+                <b>{{ formula.name }}</b>                                   
+            </span>
+        </div>
+    {% endif %}
+    {% if formElement %}       
+        <div class="">
+            <div class="p-3">
+                Champ de référence : {{ _self.factorField(formElement, []) }}
+            </div>
+        </div>
+    {% endif %}
+    {% if formula.vars|length > 0 %}
+        <div class="">
+            <div class="border-t-2 border-{{color}}-300 p-3">
+                Variables intermédiaires :
+            </div>
+            <div class="px-2">
+                {% for var in formula.vars %}
+                    <div class="bg-cyan-100 border-2 border-cyan-300 rounded-lg p-2 my-2 tracking-wider">
+                        {{ _self.factorVar(var.name) }} = {{ _self.convertShortcodes(var.formula, formElement) }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+    {% if formula.formula %}
+        <div class="">
+            <div class="border-t-2 border-{{color}}-300 p-3">
+                Formule :
+                <div class="p-2">
+                    {{ _self.convertShortcodes(formula.formula, formElement) }}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% if formula.children|length > 0 %}
+        <div class="">
+            <div class="border-t-2 border-{{color}}-300 p-3">
+                Sous-formules :
+            </div>
+            <div class="px-2">
+                {% for child in formula.children %}
+                    <div class="bg-cyan-100 border-2 border-cyan-300 rounded-lg my-2">
+                        {{ _self.formula(child, formElement ? formElement.getChildByPath(child.path) : null, "cyan") }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro convertShortcodes(formula, formElement) %}
+    {% set shortcodes = getShortcodes(formula) %}
+    {% for sc, data in shortcodes %}
+        {% set factor = '' %}
+        {% if data.type == 'FIELD' %}
+            {% set factor = _self.factorField(formElement, data.data) %}
+        {% elseif data.type == 'EMISSION' %}
+            {% set factor = _self.factorEmission(data.data) %}
+        {% elseif data.type == 'VAR' %}
+            {% set factor = _self.factorVar(data.data) %}
+        {% elseif data.type == 'FCT' %}
+            {% set factor = _self.factorFct(data.data) %}
+        {% endif %}
+        {% set formula = str_replace(sc, factor|spaceless, formula) %}
+    {% endfor %}
+    {{ formula|raw|nl2br }}
+{% endmacro %}
+
+{% macro factor(text, tooltip, color) %} 
+    {% set color = color ? color : 'fuchsia-400' %}
+    <span class="bg-{{color}} border border-black text-xs p-1 my-1 mx-1 rounded-lg relative group inline-block {% if tooltip %}cursor-pointer{% endif %}">
+        <b>{{ text }}</b>
+        {% if tooltip %}
+            <span class="absolute bg-black text-white transition transform -translate-x-1/2 pointer-events-none translate-y-0 -translate-y-2 opacity-0 group-hover:opacity-100 left-1/2 bottom-full w-72 p-1.5 text-xs">
+                <div class="text-center mb-4">
+                    <h3 class="text-{{color}}">Variable</h3>
+                </div>
+                {{ tooltip|raw }}
+            </span>
+        {% endif %}
+    </span>
+{% endmacro %}
+
+{% macro factorVar(text) %} 
+    {{ _self.factor(text, null, 'orange') }}
+{% endmacro %}
+
+{% macro factorFct(data) %}
+    {% set fct = data[0] %}
+    {% set title = fct %}
+    {% set description = '' %}
+    {% if fct == 'campaign_conso' %}
+        {% set title = 'Consommation électrique moyenne du pays de la campagne' %}
+    {% elseif fct == 'world_avg_conso' %}
+        {% set title = 'Consommation électrique moyenne mondiale' %}
+    {% elseif fct == 'device_avg_conso' %}
+        {% set title = "Consommation moyenne de l'appareil" %}
+        {% set description = "Appareil : " ~ data[1] %}
+    {% endif %}
+    {% set color = 'yellow' %}
+    <span class="bg-{{color}} border border-black text-xs p-1 my-1 mx-1 rounded-lg relative group inline-block cursor-pointer">
+        <b>{{ fct }}</b>
+        <span class="absolute bg-black text-white transition transform -translate-x-1/2 pointer-events-none translate-y-0 -translate-y-2 opacity-0 group-hover:opacity-100 left-1/2 bottom-full w-72 p-1.5 text-xs">
+            <div class="text-center mb-4">
+                <h3 class="text-{{color}}">Fonction</h3>
+            </div>
+            <b>{{ title }}</b>
+            <br/>
+            {{ description|raw }}
+        </span>
+    </span>
+{% endmacro %}
+
+{% macro factorField(field, names, label, color) %}
+    {% set color = color ? color : 'sky-300' %}    
+    {% if names and field %}
+        {% set field = field.getChildByPath(names) %}
+    {% endif %}
+    {% if field %}
+        <span class="bg-{{color}} border border-black text-xs p-1 my-1 mx-1 rounded-lg relative group cursor-pointer inline-block">            
+                <b>{{ (label ? label : field.label)|u.truncate(30, '...') }}</b>
+                <span class="absolute bg-black text-white transition transform -translate-x-1/2 pointer-events-none translate-y-0 -translate-y-2 opacity-0 group-hover:opacity-100 left-1/2 bottom-full w-72 p-1.5 text-xs">
+                    <div class="text-center mb-4">
+                        <h3 class="text-{{color}}">Champ de formulaire</h3>
+                        <b>{{ field.getCompleteLabel }}</b>
+                    </div>   
+                    {% if field.config %}  
+                        {% if field.config.unit is defined %}       
+                            <b>Unité</b> : {{ field.config.unit }}
+                        {% endif %}
+                    {% endif %}
+                </span>        
+        </span>
+    {% else %}
+        <span class="bg-red border border-black text-xs p-1 my-1 mx-1 rounded-lg relative group cursor-pointer inline-block">            
+            <b>Champ non trouvé : {{ names }} </b>
+        </span>
+    {% endif %}
+{% endmacro %}
+
+{% macro factorEmission(names, force, detail) %}
+    {% set force = force ? force : false %}
+    {% set rate = getEmissionRate(names) %}
+    {% if rate and rate.children|length > 0 and force == false %}
+        {{ _self.operator('(') }}
+        {% for r in rate.children %}
+            {% if loop.first == false %}
+                {{ _self.operator(' OU ') }}
+            {% endif %}
+            {{ _self.factorEmission(names|merge([r.name])) }}
+        {% endfor %}
+        {{ _self.operator(')') }}
+    {% elseif rate %}
+        <a href="{{ path('back_emission_update', { 'rate' : rate.id }) }}" class="bg-violet-300 border border-black text-xs p-1 my-1 mx-1 rounded-lg relative group cursor-pointer inline-block" target="_blank">
+            <b>{{ rate.label }}</b>
+            <span class="absolute bg-black text-white transition transform -translate-x-1/2 pointer-events-none translate-y-0 -translate-y-2 opacity-0 group-hover:opacity-100 left-1/2 bottom-full w-72 p-1.5 text-xs">
+                <div class="text-center mb-4">
+                    <h3 class="text-violet-300">Facteur d'émission</h3>
+                    <b>{{ rate.getCompleteLabel }}</b>
+                </div>            
+                {% if detail %}
+                    <p class="text-center">{{ detail|raw }}</p>
+                    <br/>
+                {% endif %}
+                {% if rate.children|length == 0 %}
+                    <hr/>
+                    <b>Valeur</b> : {{ rate.getCurrentValue() }} 
+                    <br/><hr/>
+                    <b>Unité</b> : {{ rate.getRecursiveUnit() }}
+                    <br/><hr/>
+                    <b>Remarque</b> : {{ rate.getRecursiveComment()|nl2br }}
+                    <br/><hr/>
+                    <b>Source</b> : {{ rate.getRecursiveSource()|nl2br }}
+                {% endif %}
+            </span>
+        </a>
+    {% else %}
+        <span class="bg-red border border-black text-xs p-1 my-1 mx-1 rounded-lg relative group cursor-pointer inline-block">            
+            <b>Facteur d'émission non trouvé : {{ names|join('.') }} </b>
+        </span>
+    {% endif %}
+{% endmacro %}
+
+{% macro factorLocalization(country) %}
+    <span class="bg-yellow-200 border border-black p-2 my-2 mx-1 rounded-lg relative group cursor-pointer inline-block">
+        Consommation électrique du pays
+        <span class="absolute bg-black text-white transition transform -translate-x-1/2 pointer-events-none translate-y-0 -translate-y-2 opacity-0 group-hover:opacity-100 left-1/2 bottom-full w-72 p-1.5 text-xs">
+            <div class="text-center mb-4">
+                <h3 class="text-yellow-200">Facteur d'émission</h3>
+                <b>Consommation électrique du pays</b>
+            </div>
+            <p class="text-center">
+                Consommation électrique déterminée en fonction du pays sélectionné dans le champ suivant :
+                <br/>
+                <span class="bg-sky-300 border border-black p-2 my-2 mx-1 rounded-lg inline-block">{{ country }}</span>
+             </p>
+        </span>
+    </span>
+{% endmacro %}
+
+{% macro factorWorldconso() %}
+    <span class="bg-yellow-200 border border-black p-2 my-2 mx-1 rounded-lg relative group cursor-pointer inline-block">
+        Consommation moyenne mondiale
+        <span class="absolute bg-black text-white transition transform -translate-x-1/2 pointer-events-none translate-y-0 -translate-y-2 opacity-0 group-hover:opacity-100 left-1/2 bottom-full w-72 p-1.5 text-xs">
+            <div class="text-center mb-4">
+                <h3 class="text-yellow-200">Facteur d'émission</h3>
+                <b>Consommation moyenne mondiale</b>
+            </div>
+            <p class="text-center">Calculé automatiquement via la moyenne des consommations par pays</p>
+            <br/>
+            {% set rate = getEmissionRate(['localization']) %}
+            {% set sum = 0 %}
+            {% for c in rate.children %}
+                {% set sum = sum + c.getCurrentValue() %}
+            {% endfor %}
+            <hr/>
+            <b>Valeur</b> : {{ sum / rate.children|length }} 
+        </span>
+    </span>
+{% endmacro %}
+
+{% macro factorAppareilConsoMoyen(appareil) %}
+    <span class="bg-yellow-200 border border-black p-2 my-2 mx-1 rounded-lg relative group cursor-pointer inline-block">
+        Consommation moyenne {{ appareil }}
+        <span class="absolute bg-black text-white transition transform -translate-x-1/2 pointer-events-none translate-y-0 -translate-y-2 opacity-0 group-hover:opacity-100 left-1/2 bottom-full w-72 p-1.5 text-xs">
+            <div class="text-center mb-4">
+                <h3 class="text-yellow-200">Facteur d'émission</h3>
+                <b>Consommation moyenne {{ appareil }}</b>
+            </div>
+            <p class="text-center">
+                Calculé selon la formule suivante : 
+                <br/>
+                <span class="bg-violet-300 border border-black p-2 my-2 mx-1 rounded-lg inline-block">Consommation moyenne / an</span> 
+                <br/>
+                / 
+                <br/>
+                ( <span class="bg-violet-300 border border-black p-2 my-2 mx-1 rounded-lg inline-block">Durée</span> * 365.25 * 3600 )
+            </p>   
+        </span>
+    </span>
+{% endmacro %}

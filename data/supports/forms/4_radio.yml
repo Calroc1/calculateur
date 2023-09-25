@@ -1,0 +1,128 @@
+name: radio
+label: Radio
+color: '#FFCD56'
+referential: Bilobay
+type: Radio
+children:
+- name: conception
+  phase: conception
+  label: Conception - création de la campagne
+  type: collection
+  unit: prestataire  
+  renamable: true
+  children:
+    - name: temps_interne
+      label: Temps de conception en interne
+      type: integer
+      unit: jours.homme
+      help: Ce poste regroupe les émissions fixes de l'activité (énergie, fret, déplacements
+        domicile-travail des salariés, déplacements des visiteurs, intrants, déchets,
+        amortissements)
+    - name: temps_externe
+      label: Temps passé des prestataires extérieurs (directeur artistique, consultant...),
+        basé sur la durée de leur prestation
+      type: integer
+      unit: jours.homme
+    - name: visio
+      label: Visio pour la conception
+      type: section
+      display: table
+      children:
+      - name: temps
+        label: Durée
+        type: integer
+        unit: heures
+      - name: participants
+        label: Nombre moyen de participants
+        type: integer
+    - name: deplacements
+      label: Déplacements clients-agence et agence-clients, prestataire-agence et
+        agence-prestataire ou régie-agence et agence-régie
+      type: section
+      display: table
+      percentage: true
+      children:
+      - name: voiture
+        label: En voiture
+        type: integer
+        unit: km
+      - name: avion
+        label: En avion
+        type: integer
+        unit: km
+      - name: train
+        label: En train
+        type: integer
+        unit: km
+    - name: hotel
+      label: Nuitées d’hotel
+      type: integer
+      unit: nuitées
+- name: enregistrement_production
+  phase: production
+  label: Enregistrement et production
+  type: collection
+  unit: Enregistrement et production
+  children:
+  - name: temps_externe
+    label: Temps passé des prestataires extérieurs (enregistrement, montage, comédiens,
+      post production), basé sur la durée de leur prestation
+    type: integer
+    unit: jours.homme
+  - name: visio
+    label: Visio pour l'enregistrement et la production
+    type: section
+    display: table
+    children:
+    - name: temps
+      label: Durée
+      type: integer
+      unit: heures
+    - name: participants
+      label: Nombre moyen de participants
+      type: integer
+  - name: deplacements
+    label: Déplacements vers le studio, repérage, tournage, enregistrement, comédiens,
+      production, post production
+    type: section
+    display: table
+    percentage: true
+    children:
+    - name: voiture
+      label: En voiture
+      type: integer
+      unit: km
+    - name: camion
+      label: En camion
+      type: integer
+      unit: km
+    - name: avion
+      label: En avion
+      type: integer
+      unit: km
+    - name: train
+      label: En train
+      type: integer
+      unit: km
+  - name: hotel
+    label: Nuitées d’hotel
+    type: integer
+    unit: nuitées    
+- name: diffusion
+  phase: diffusion
+  label: Diffusion
+  type: collection  
+  unit: spot
+  display: table
+  children:
+    - name: duree
+      label: Durée du spot
+      type: integer
+      unit: sec
+    - name: nb_diffusions
+      label: Nombre de diffusions
+      type: integer
+      linebreak: true
+    - name: nb_auditeurs
+      label: Nombres d’auditeurs moyen par diffusion
+      type: integer

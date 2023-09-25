@@ -1,0 +1,10 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Ajouter un formulaire{% endblock %}
+
+{% block body %}
+    <h1 class="text-3xl text-black pb-6">Ajouter un formulaire</h1>
+    <div class="my-5 border rounded bg-white shadow px-6 py-3">     
+        {% include 'back/support/_form.support.html.twig' with { 'form' : form }  %}
+    </div>
+{% endblock %}

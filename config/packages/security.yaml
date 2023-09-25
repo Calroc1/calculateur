@@ -1,0 +1,53 @@
+security:
+    encoders:
+        App\Entity\User:
+            algorithm: auto
+        App\Entity\Admin:
+            algorithm: auto
+    providers:
+        user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+        admin_provider:
+            entity:
+                class: App\Entity\Admin
+                property: email
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        back:
+            pattern: /superadmin
+            provider: admin_provider   
+            anonymous: lazy
+            form_login:
+                login_path: back_security_login
+                check_path: back_security_login_check
+                always_use_default_target_path: true
+                default_target_path: back_home
+            logout:
+                path: back_security_logout
+                target: back_home
+        front:
+            pattern: /
+            provider: user_provider    
+            user_checker: App\Security\UserChecker
+            anonymous: lazy            
+            form_login:
+                login_path: front_security_login
+                check_path: front_security_login_check
+                always_use_default_target_path: true
+                default_target_path: front_home
+            logout:
+                path: front_security_logout
+                target: front_home
+    access_control:
+        # back
+        - { path: ^/superadmin/connexion, role: IS_AUTHENTICATED_ANONYMOUSLY }    
+        - { path: ^/superadmin, roles: ROLE_ADMIN }
+        # front
+        - { path: ^/connexion, role: IS_AUTHENTICATED_ANONYMOUSLY }    
+        - { path: ^/invitation, role: IS_AUTHENTICATED_ANONYMOUSLY }    
+        - { path: ^/mot-de-passe, role: IS_AUTHENTICATED_ANONYMOUSLY }    
+        - { path: ^/, roles: ROLE_USER }

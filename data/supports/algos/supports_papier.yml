@@ -1,0 +1,57 @@
+- 
+  name: Conception
+  path: conception
+  formula: |
+    ( __FIELD[temps_interne]__ * __EMISSION[temps_conception]__ )
+    + ( __FIELD[temps_externe]__ * __EMISSION[temps_conception]__ )
+    + ( (__FIELD[visio.temps]__ * 60 * __FIELD[visio.participants]__) * __EMISSION[visio]__ / 1000)
+    + ( 
+          (__FIELD[deplacements.voiture]__ * __EMISSION[deplacements.voiture]__) 
+        + (__FIELD[deplacements.avion]__ * __EMISSION[deplacements.avion]__)
+        + (__FIELD[deplacements.train]__ * __EMISSION[deplacements.train]__)
+        + (__FIELD[hotel]__ * __EMISSION[deplacements.hotel]__)
+    )
+-
+  name: Shooting
+  path: shooting
+  formula: |
+      + ( __FIELD[temps_externe]__ * __EMISSION[temps_conception]__ )
+      + ( (__FIELD[visio.temps]__ * 60 * __FIELD[visio.participants]__) * __EMISSION[visio]__ / 1000 )
+      + ( 
+            (__FIELD[deplacements.voiture]__ * __EMISSION[deplacements.voiture]__) 
+            + (__FIELD[deplacements.avion]__ * __EMISSION[deplacements.avion]__)
+            + (__FIELD[deplacements.train]__ * __EMISSION[deplacements.train]__)
+            + (__FIELD[hotel]__ * __EMISSION[deplacements.hotel]__)
+      )
+- 
+  name: Impression
+  path: impression
+  vars: 
+    -
+      name: poids_papier
+      formula: (__FIELD[poids_papier.surface]__ * __FIELD[poids_papier.nb]__ * __FIELD[poids_papier.nb_pages]__ * __FIELD[poids_papier.grammage]__) / 1000000
+    -
+      name: poids_total
+      formula: __VAR[poids_papier]__
+    -
+      name: transport_papetier_imprimeur
+      formula: __FIELD[transport.papetier_imprimeur.distance]__ * ceil(__VAR[poids_total]__ / 15 ) * 2
+    -
+      name: transport_imprimeur_afficheur
+      formula: __FIELD[transport.imprimeur_afficheur.distance]__ * ceil(__VAR[poids_total]__ / 15 ) * 2
+  formula: | 
+      (__VAR[poids_papier]__ * __EMISSION[impression.papier_vierge]__)
+      + (__VAR[poids_papier]__ * __EMISSION[impression.process_impression]__)
+      + (__VAR[transport_papetier_imprimeur]__ * __EMISSION[impression.transport_papetier_imprimeur]__)
+      + (__VAR[transport_imprimeur_afficheur]__ * __EMISSION[impression.transport_imprimeur_afficheur]__)
+- 
+  name: Distribution
+  path: distribution
+  formula: | 
+      (__EMISSION[supports_papier.diffusion.camion]__ * __FIELD[camion.distance]__ * __FIELD[camion.quantite]__)
+      + (__EMISSION[supports_papier.diffusion.camionnette]__ * __FIELD[camionnette.distance]__ * __FIELD[camionnette.quantite]__)
+      + (__EMISSION[supports_papier.diffusion.voiture]__ * __FIELD[voiture.distance]__ * __FIELD[voiture.quantite]__)
+- 
+  name: Fin de vie
+  path: impression
+  formula: __EMISSION[impression.fin_de_vie_papier]__ * ( (__FIELD[poids_papier.surface]__ * __FIELD[poids_papier.nb]__ * __FIELD[poids_papier.nb_pages]__ * __FIELD[poids_papier.grammage]__) / 1000000 )

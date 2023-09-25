@@ -1,0 +1,169 @@
+{% macro createList(rootItem, dataTypes, dataOptions, listType, filters = []) %}
+	<div x-data="listComponent({{filters|json_encode}})" class="relative">
+		{% if not filters is empty %}
+			<div class="list__sort {{'list__sort--' ~ listType ?? ''}} w-full flex justify-end mb-3 -mt-9">
+				<div data-role="list-filters" :class="'filtering--' + state" class="list__sort__desktop {{listType == 'nested' ? 'w-full' : 'w-max'}} hidden lg:flex flex-col lg:flex-row items-center cursor-pointer">
+					{{ _self.filters(listType, dataTypes, filters, 'desktop') }}
+				</div>
+				<div class="list__sort__mobile lg:hidden">
+					<button data-trigger="modal-list-filter" class="modal__trigger btn btn--yellow ml-auto">Trier la liste</button>
+					<div id="modal-list-filter" class="modal">
+						<div class="modal__bg"></div>
+						<div class="modal__filter flex flex-col rounded-lg border border-darkgrey bg-white overflow-hidden">
+							<p class="modal__instruction">Selectionnez un filtre</p>
+							{{ _self.filters(listType, dataTypes, filters, 'mobile') }}
+						</div>
+					</div>
+				</div>
+			</div>
+		{% endif %}
+
+		<div data-role="list" class="list {{ 'list--' ~ listType ?? ''}} grid gap-y-4">
+			{% if listType == "state" %}
+				{% for item in rootItem %}
+					{% set campaign = {
+					id: item.id,
+					datas: [
+						item.name,
+						item.author,
+						item.dateEnd|date('d.m.Y'),
+						item.statusTranslated
+					],
+					state: item.status,
+				} %}
+					{{ _self.item(campaign, dataTypes, dataOptions, item) }}
+				{% endfor %}
+			{% elseif listType == "nested" %}
+				{% if rootItem.lvl == 0 %}
+					{% for item in rootItem.children %}
+						{{ _self.nested(item, dataTypes, dataOptions) }}
+					{% endfor %}
+				{% elseif rootItem.lvl == 1 %}
+					{{ _self.nested(rootItem, dataTypes, dataOptions) }}
+				{% endif %}
+			{% endif %}
+		</div>
+	</div>
+{% endmacro %}
+
+{% macro nested(item, types, options = []) %}
+	<div x-data="dropdown" {% if app.user.organism.lvl is defined and app.user.organism.lvl == 1 %} x-init="open = true" {% endif %} class="item__dropdown grid gap-y-4">
+		{% set organism = {'datas': [ item.name ], 'hasChild': true} %}
+		{{ _self.item(organism, types.organism, options.organism, item)}}
+
+		{% if item.users ?? null %}
+			<div x-cloak x-show="open" class="item__nested-list ml-16 grid gap-y-4">
+				{% for subItem in item.users %}
+					{% set user = {
+						id: subItem.id,
+						datas: [
+							subItem, 
+							subItem.statusTranslated
+						], 
+						hasChild: false} %}
+					{{ _self.item(user, types.user, options.user, subItem) }}
+				{% endfor %}
+			</div>
+		{% endif %}
+	</div>
+{% endmacro %}
+
+{% macro item(item, types, options = [], object) %}
+
+	{% set entityName = getClassName(object) %}
+	{% set entity = {(entityName): object.id} %}
+
+	<div id="{{ entityName ~ '-' ~ entity[entityName]}}" {% if item.hasChild is defined %} data-lvl="{{item.hasChild ? 0 : 1}}" {% endif %} class="item {{ item.state is defined ? 'item--' ~ item.state }} flex items-stretch lg:items-center w-full border-l-8 bg-white box-shadow rounded-md overflow-hidden h-12 hover:bg-opacity-50">
+		<div class="item__content flex flex-col lg:flex-row justify-center lg:justify-start lg:items-center h-full w-full pl-4 lg:pl-0">
+
+			<div class="item__main flex flex-col lg:flex-row justify-between h-full w-full cursor-pointer" @click="{% if item.hasChild is defined %} {% if item.hasChild %} if(!open) {open = true} else if (isSameItem({{entity|json_encode}})) {open = false} {% endif %} fetchItem('{{entity|json_encode}}'); {% endif %}">
+				<div class="item__main__title flex items-center text-black px-4 transition-transform duration-150">
+					<p data-type="{{types[0]}}">{{ attribute(object, types[0]) }}</p>
+					{% if item.hasChild is defined and item.hasChild %}
+						<svg x-bind:class="{'rotate-90': open}" class="transform transition duration-150 ml-4" width="8" height="13" viewbox="0 0 8 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M1.60443 11.6044L6.60443 6.58074L1.60443 1.39551" stroke="#202A3C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+						</svg>
+					{% endif %}
+				</div>
+				<div class="item__main__datas flex items-center">
+					{% set dataCount = types|length %}
+					{# {% set width = dataCount - 1 > 1 ? 'w-1/' ~ (dataCount - 1) : 'w-full' %} #}
+					{% for key in types|slice(1, dataCount) %}
+						{% if key == "__toString" %}
+							<span data-type="{{key}}" class="item__main__name">
+								{{ object }}
+							</span>
+						{% else %}
+							<span data-type="{{key}}" class="item__main__{{ types[loop.index] }}">
+								{% if key == "dateEnd" %}
+									{{ attribute(object, key)|date('d.m.Y') }}
+								{% else %}
+									{{ attribute(object, key) }}
+								{% endif %}
+							</span>
+						{% endif %}
+					{% endfor %}
+				</div>
+			</div>
+
+			<div class="item__options flex justify-items-stretch lg:justify-start lg:flex h-full">
+				{% for name, link in options %}
+					{% set parameters = entity %}
+					{% if link.parameters is defined %}
+						{% set parameters = entity|merge(link.parameters) %}
+					{% endif %}
+					{#{% set access = link.path|replace({'front_':''}) %}#}
+					{% if link.right is not defined or is_granted(link.right, object) %}
+						{% set fetchUrl = (link.path is defined) ? path(link.path, parameters) : '#' %}
+						<a class="item__option item__option--{{ name }} relative h-full w-14 flex items-center justify-center text-grey-light hover:text-secondary" href="{{fetchUrl}}" 
+						{% if name == 'trash' %} 
+						@click.prevent="$dispatch('modal-trigger', {actions: [ {callback() {window.location.replace($el.href);}, name: 'Supprimer', class: 'btn--secondary'} ], msg: 'Supprimer l\'élément ?'});" 
+						{% endif %}>
+							{{ includeSVG('btn-' ~ name ~ '.svg') }}
+						</a>
+					{% endif %}
+				{% endfor %}
+			</div>
+
+		</div>
+	</div>
+{% endmacro %}
+
+{% macro filters(listType, dataTypes, filters, device) %}
+	{% set iterators = null%}
+
+	{% if listType == 'nested' %}
+		{% set iterators = ['organism', 'user'] %}
+	{% endif %}
+
+	{% if iterators is not null %}
+		{% for iterator in iterators %}
+			{% for filterName, filterLabel in filters[iterator] %}
+				{{ device == 'mobile' ? _self.filterMobile(filterName, filterLabel) : _self.filterDesktop(filterName, filterLabel) }}
+			{% endfor %}
+		{% endfor %}
+	{% else %}
+		{% for filterName, filterLabel in filters %}
+			{{ device == 'mobile' ? _self.filterMobile(filterName, filterLabel) : _self.filterDesktop(filterName, filterLabel) }}
+		{% endfor %}
+	{% endif %}
+
+{% endmacro %}
+
+{% macro filterDesktop(type, name) %}
+	<div data-filter="{{type}}" x-ref="{{type}}" class="list__sort__filter flex items-center">
+		<p class="mr-1.5 text-base font-black text-grey-light capitalize">{{ name }}</p>
+		<svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewbox="0 0 11.416 19.517">
+			<g data-name="arrow_simple" transform="translate(1.5 1.5)"><path d="M0,8.259,8.416,0,0,8.259l8.416,8.259Z" transform="translate(8.416 16.517) rotate(-180)" fill="none" stroke="#D3CECB" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="3"/></g>
+		</svg>
+	</div>
+{% endmacro %}
+
+{% macro filterMobile(type, name) %}
+	<div id="filter-mobile-{{ type }}" class="list__sort__filter flex items-center w-full">
+		<p class="mr-2 text-base font-bold text-grey-light">{{ name }}</p>
+		<svg xmlns="http://www.w3.org/2000/svg" width="11.416" height="19.517" viewbox="0 0 11.416 19.517">
+			<g data-name="arrow_simple" transform="translate(1.5 1.5)"><path d="M0,8.259,8.416,0,0,8.259l8.416,8.259Z" transform="translate(8.416 16.517) rotate(-180)" fill="none" stroke="#2a3f70" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2"/></g>
+		</svg>
+	</div>
+{% endmacro %}

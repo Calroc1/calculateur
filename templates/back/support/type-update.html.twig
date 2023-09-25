@@ -1,0 +1,24 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Modifier le type de support{% endblock %}
+
+{% block body %}
+    {% set type = app.request.get('type') %}
+    <h1 class="text-3xl text-black pb-6">Modifier le type de support</h1>
+    <div class="my-5 border rounded bg-white shadow">
+        <div class="grid grid-cols-2 px-3 py-3 border-b">
+            <div>
+                <h3><i class="fas mr-3 fa-calculator"></i>{{ type.name }} </h3> 
+            </div>
+            <div class="text-right">
+                <a href="{{ path('back_support_type_delete', { 'type' : type.id }) }}" class="align-middle px-5 py-2 text-sm rounded-full font-semibold text-white border border-radius-10 bg-red hover:bg-red">Supprimer</a>
+            </div>
+        </div>
+        <div class="border-t">
+            <span class="p-3 border border-t-0 border-l-0 m-0 inline-block font-bold bg-cyan-200">Informations</span>
+            <div class="px-6 py-3">
+                {% include 'back/support/_form.support.html.twig' with { 'form' : formUpdate } %}    
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% set params = {
+    'success' : {
+        'class' : 'bg-green'
+    },
+    'error' : {
+        'class' : 'bg-red'
+    },
+    'warning' : {
+        'class' : 'bg-orange'
+    }
+} %}
+<div class="flex items-center {{ params[type].class }} text-white font-bold px-4 py-3 my-2.5 {{ class }}" role="alert">
+    {{ includeSVG('info.svg') }}
+    <p>{{ message }}</p>
+</div>

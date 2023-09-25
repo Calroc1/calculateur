@@ -1,0 +1,127 @@
+<template x-if="countries && Object.keys(countries).length > 0">
+    <div class="mr-4">
+        <label for="country" class="font-medium my-4 block">Pays</label>
+        <div class="filter-input">
+            <select @change="changeFilter($event.target)" :disabled="Object.keys(countries).length === 1 && 'disabled'" name="country" id="country" class="text-xs rounded-xl bg-white-dark font-light w-48">
+                <option value="all" :selected="Object.keys(countries).length > 1 && 'selected'">Tous les pays</option>
+                <template x-for="[key, value] in Object.entries(countries)" :key="key">
+                    <option :value="key" x-text="value" :selected="Object.keys(countries).length === 1 && 'selected'"></option>
+                </template>
+            </select>
+        </div>
+    </div>
+</template>
+<template x-if="statuses && Object.keys(statuses).length > 0">
+    <div class="mr-4">
+        <label for="country" class="font-medium my-4 block">État</label>
+        <div class="filter-input">
+            <select @change="changeFilter($event.target)" :disabled="Object.keys(statuses).length === 1 && 'disabled'" name="status" id="status" class="text-xs rounded-xl bg-white-dark font-light w-48">
+                <option value="all" :selected="Object.keys(statuses).length > 1 && 'selected'">Tous les états</option>
+                <template x-for="[key, value] in Object.entries(statuses)" :key="key">
+                    <option :value="key" x-text="value" :selected="Object.keys(statuses).length === 1 && 'selected'"></option>
+                </template>
+            </select>
+        </div>
+    </div>
+</template>
+<template x-if="availableKeywords && Object.keys(availableKeywords).length > 0">
+    <div class="mr-4">
+        <label for="keyword" class="font-medium my-4 block">Critère</label>
+        <div class="filter-input">
+            <select @change="changeFilter($event.target)" name="keyword" id="keyword" class="text-xs rounded-xl bg-white-dark font-light w-48">
+                <option value="all" :selected="Object.keys(availableKeywords).length > 1 && 'selected'">Tous les critères</option>
+                <template x-for="[key, value] in Object.entries(availableKeywords)" :key="key">
+                    <optgroup :label="value.label">
+                        <template x-for="word in value.words">
+                            <option :data-label="key" :value="word" x-text="word"></option>
+                        </template>
+                    </optgroup>
+                </template>
+            </select>
+        </div>
+    </div>
+</template>
+<div class="mr-4">
+    <label for="date" class="font-medium my-4 block">Période</label>
+    <div class="flex items-center justify-start">
+        <div class="filter-input flex items-center justify-start">
+            <label for="dateStart">De</label>
+            <input @change="changeFilter($event.target)" type="date" name="dateStart" id="dateStart" :value="dateStart" class="text-xs rounded-xl bg-white-dark font-light w-40 ml-3">
+        </div>
+        <div class="filter-input flex items-center justify-start ml-3">
+            <label for="dateEnd">à</label>
+            <input @change="changeFilter($event.target)" type="date" name="dateEnd" id="dateEnd" :value="dateEnd" class="text-xs rounded-xl bg-white-dark font-light w-40 ml-3">
+        </div>
+    </div>
+</div>
+<div class="mr-4" :class="isLoading && 'loading'">
+    <label for="campaigns" class="font-medium my-4 block">Campagne</label>
+    {% if multiselect %}
+        <div class="filter-input relative" :class="openCampaigns && 'open'" @click.outside="openCampaigns = false">
+        <select x-show="false" :value="filter.campaigns.length > 0 ? filter.campaigns : 'all'" multiple autocomplete="off" :name="filter.campaigns.length == 0 ? 'campaigns-select' : 'campaigns-select[]'">
+            <template x-for="campaign in campaigns">
+                <option :value="campaign.id" x-text="campaign.name.length > 25 ? campaign.name.substring(0, 25)+'...' : campaign.name" selected x-show="filter.campaigns.find(el => parseInt(el) === parseInt(campaign.id))"></option>
+            </template>
+
+            <template x-if="filter.campaigns.length == 0">
+                <option value="all" selected>All</option>
+            </template>
+        </select>
+        <input autocomplete="off" @focusin="onClick" @change="changeFilter($event.target)" x-model="campaignInput" type="text" :placeholder="campaigns.length > 0 ? 'Sélectionnez vos campagnes' : 'Aucune campagne disponible'" name="campaigns" id="campaigns" class="text-xs rounded-xl bg-white-dark font-light w-56 h-10">
+        <template x-if="isLoading">
+            <div class="loader">
+                <img class="mx-auto my-20 w-8" src="{{asset('media/pictos/loader.gif')}}" alt="">
+            </div>
+        </template>
+        <div class="checkboxes box-shadow scrollbar">
+            <template x-if="filter.campaigns.length === campaigns.length">
+                <label for="all-campaigns" class="option">
+                    <input type="checkbox" id="all-campaigns" value="all-campaigns" @change="changeCampaign($event, true)" checked><span>Tout décocher</span>
+                </label>
+            </template>
+            <template x-if="filter.campaigns.length !== campaigns.length">
+                <label for="all-campaigns" class="option">
+                    <input type="checkbox" id="all-campaigns" value="all-campaigns" @change="changeCampaign($event, true)"><span>Tout cocher</span>
+                </label>
+            </template>
+            <template x-for="campaign in campaigns">
+                <div>
+                    <template x-if="filter.campaigns.find(el => parseInt(el) === parseInt(campaign.id)) && campaign.name.toLowerCase().includes(campaignInput.toLowerCase())">
+                        <label :for="'campaign-'+campaign.id" class="option">
+                            <input type="checkbox" :id="'campaign-'+campaign.id" :value="campaign.id" @change="changeCampaign($event, true)" checked>
+                            <span :data-value="campaign.id" x-text="campaign.name.length > 25 ? campaign.name.substring(0, 25)+'...' : campaign.name"></span>
+                        </label>
+                    </template>
+                    <template x-if="!filter.campaigns.find(el => parseInt(el) === parseInt(campaign.id)) && campaign.name.toLowerCase().includes(campaignInput.toLowerCase())">
+                        <label :for="'campaign-'+campaign.id" class="option">
+                            <input type="checkbox" :id="'campaign-'+campaign.id" :value="campaign.id" @change="changeCampaign($event, true)">
+                            <span :data-value="campaign.id" x-text="campaign.name.length > 25 ? campaign.name.substring(0, 25)+'...' : campaign.name"></span>
+                        </label>
+                    </template>
+                </div>
+            </template>
+        </div>
+    </div>
+    {% else %}
+        <div class="filter-input relative">
+            <template x-if="campaigns.length > 0">
+                <select :value="filter.campaigns.length > 0 ? filter.campaigns[0] : 'empty'" autocomplete="off" name="campaigns" id="campaigns" class="text-xs rounded-xl bg-white-dark font-light w-56 h-10" @change="changeCampaign($event, false)">
+                    <option value="empty" disabled>Sélectionnez votre campagne</option>
+                    <template x-for="campaign in campaigns">
+                        <option :value="campaign.id" x-text="campaign.name.length > 25 ? campaign.name.substring(0, 25)+'...' : campaign.name"></option>
+                    </template>
+                </select>
+            </template>
+            <template x-if="campaigns.length === 0">
+                <select autocomplete="off" name="campaigns" id="campaigns" class="text-xs rounded-xl bg-white-dark font-light w-56 h-10">
+                    <option selected disabled>Aucune campagne disponible</option>
+                </select>
+            </template>
+            <template x-if="isLoading">
+                <div class="loader">
+                    <img class="mx-auto my-20 w-8" src="{{asset('media/pictos/loader.gif')}}" alt="">
+                </div>
+            </template>
+        </div>
+    {% endif %}
+</div>

@@ -1,0 +1,94 @@
+:root {
+    --litepicker-day-width: calc(100% / 7);
+    --litepicker-button-prev-month-color: #fff;
+    --litepicker-button-next-month-color: #fff;
+    --litepicker-day-color-hover: theme("colors.secondary");
+    --litepicker-is-end-color-bg: theme("colors.secondary");
+    --litepicker-is-today-color: theme("colors.black.DEFAULT");
+}
+
+.litepicker {
+    @apply w-full;
+
+    .container__months {
+        @apply shadow-none;
+    }
+
+    .container__days {
+        .day-item {
+            @apply relative z-10 cursor-pointer font-medium transition-none;
+
+            &::before {
+                content: "";
+                z-index: -1;
+                @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-6 w-6 rounded-md hidden;
+            }
+
+            &:hover {
+                @apply shadow-none text-secondary;
+
+                &::before {
+                    @apply block border-2 border-secondary;
+                }
+            }
+
+            &.is-today {
+                @apply bg-none font-bold text-primary;
+
+                &::before {
+                    @apply block border-2 border-primary;
+                }
+
+                &:hover {
+                    @apply text-secondary;
+
+                    &::before {
+                        @apply border-secondary;
+                    }
+                }
+            }
+
+            &.is-highlighted {
+                @apply bg-transparent text-white;
+
+                &::before {
+                    @apply block bg-primary;
+                }
+
+                &:hover {
+                    @apply text-secondary;
+
+                    &::before {
+                        @apply bg-transparent border-secondary;
+                    }
+                }
+            }
+
+            &.is-start-date,
+            &.is-end-date {
+                @apply bg-transparent text-white;
+
+                &::before {
+                    @apply block bg-secondary border-secondary;
+                }
+
+                &:hover {
+                    @apply text-white;
+
+                    &::before {
+                        @apply border-secondary bg-secondary;
+                    }
+                }
+            }
+        }
+    }
+
+    .container__days {
+        height: 152px;
+
+        & > .day-item,
+        & > a {
+            @apply py-1.5;
+        }
+    }
+}

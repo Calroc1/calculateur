@@ -1,0 +1,23 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block body_security %}
+	<form class="py-10 px-8 flex flex-col" method="post" action="{{ path('front_security_login_check') }}" novalidate>
+		<div class="flex flex-col justify-start items-start mb-2">
+			<label for="_username" class="my-4">E-mail / identifiant</label>
+			<input type="text" id="_username" name="_username" class="w-full bg-white-dark px-4 py-3 rounded-lg">
+		</div>
+		<div class="flex flex-col justify-start items-start my-2">
+			<label for="_password" class="my-4">Mot de passe</label>
+			<input type="password" id="_password" name="_password" class="w-full bg-white-dark px-4 py-3 rounded-lg">
+		</div>
+		<div class="flex w-full justify-end my-2">
+			<a href="{{ path('front_security_password_request') }}" class="no-underline text-black font-medium">Mot de passe oublié ?</a>
+		</div>
+		{% if error %}
+			{{ showNotification(error.messageKey|trans(error.messageData, 'security'), 'error') }}
+		{% endif %}
+		<button type="submit" name="submit" class="btn btn--secondary">Se connecter</button>
+	</form>
+{% endblock %}

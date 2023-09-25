@@ -1,0 +1,36 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Formulaires > Référentiels{% endblock %}
+
+{% block body %}
+    <h1 class="text-3xl text-black pb-6">Formulaires > Référentiels</h1>
+    <div class="my-5 border rounded bg-white shadow">
+        <div class="px-6 py-8 border-b">
+            <h3>Ajouter un type</h3>
+            {% include 'back/support/_form.referential.html.twig' with { 'form' : formAdd } %}    
+        </div>
+        <div class="px-6 py-3">
+            <table class="mt-3 w-full border-collapse">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="border p-3">Nom</th>
+                        <th class="border p-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for referential in referentials %}
+                        <tr>
+                            <td class="border p-3">
+                                {{ referential.name }}
+                            </td>
+                            <td class="border p-3">
+                                <a href="{{ path('back_support_referential_update', { 'referential' : referential.id }) }}" class="align-middle px-5 py-2 text-xs rounded-full font-semibold text-white border border-radius-10 bg-cyan-500 hover:bg-cyan-600">Editer</a>
+                                <a href="{{ path('back_support_referential_delete', { 'referential' : referential.id }) }}" class="align-middle px-5 py-2 text-xs rounded-full font-semibold text-white border border-radius-10 bg-red hover:bg-red">Supprimer</a>
+                            </td>
+                        </tr>                        
+                    {% endfor %}    
+                  </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

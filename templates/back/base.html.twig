@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+        <meta name="format-detection" content="telephone=no">
+        <title>
+            ADMIN ||
+            {% block title %}{% endblock %}
+        </title>
+
+        {% if bugherd_key %}
+            <script type="text/javascript" src="https://www.bugherd.com/sidebarv2.js?apikey={{ bugherd_key }}" async="true"></script>
+        {% endif %}
+
+        {% block stylesheets %}
+            {{ encore_entry_link_tags('vendor_css') }}
+            {{ encore_entry_link_tags('app_css') }}
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">            
+        {% endblock %}
+
+        {% block javascripts %}
+            {{ encore_entry_script_tags('admin_app') }}
+            <script src="{{ asset('bundles/fosjsrouting/js/router.min.js') }}"></script>
+            <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>
+        {% endblock %}
+    </head>
+    <body class="min-w-full min-h-screen w-auto h-auto flex">
+        {% if block('body_security') is defined %}
+            <div class="container p-6 min-w-full min-h-screen justify-center items-center relative hidden lg:flex">
+                <div id="modal-security" class="relative bg-white rounded-md overflow-hidden text-xs shadow-xl">
+                    <div class="flex justify-center bg-primary py-10 px-6">
+                        <img src="{{ asset('media/logos/login-title.svg') }}" alt="Logo login">
+                    </div>
+                    {% for message in app.flashes('security_success') %}
+                        {{ showNotification(message, 'success', 'mx-4 mt-4') }}
+                    {% endfor %}
+                    {{ block('body_security') }}
+                </div>
+            </div>
+        {% else %}
+            {% include "back/parts/_sidebar.html.twig" %}
+            <div class="w-full flex flex-col h-screen overflow-y-hidden">
+                {% include "back/parts/_header.html.twig" %}
+                <main class="w-full flex-grow px-6 py-10 overflow-y-auto">
+                    {% for message in app.flashes('success') %}
+						{{ showNotification(message, 'success', 'col-span-full mt-4') }}
+					{% endfor %}
+					{% for message in app.flashes('error') %}
+						{{ showNotification(message, 'error', 'col-span-full mt-4') }}
+					{% endfor %}
+                    {% block body %}{% endblock %}
+                </main>
+            </div>
+        {% endif %}
+    </body>
+</html>

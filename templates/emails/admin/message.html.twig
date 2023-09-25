@@ -1,0 +1,19 @@
+{% extends 'emails/base.html.twig' %}
+
+{% block body %}
+    Bonjour,
+    <br/><br/>
+    Un utilisateur vous a envoyé un message :
+    <br/><br/>
+    <strong>Utilisateur</strong> : {{ user }}
+    <br/>
+    <strong>Email</strong> : {{ user.email }}
+    <br/>
+    <strong>Organisation / entreprise</strong> : {{ user.organism.name }}
+    <br/>
+    <strong>Message</strong> :
+    <br/>
+    {{ message|nl2br}}
+    <br/><br/>
+    Cordialement,
+{% endblock %}

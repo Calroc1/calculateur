@@ -1,0 +1,13 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Modifier l'organisation{% endblock %}
+
+{% block body %}
+    <section class="col-span-full mt-6 lg:mt-14">
+        <h1 class="text-3xl font-medium leading-extra-loose w-full text-grey-light">
+            Mon entreprise<span class="font-normal mx-5">|</span><span class="font-bold text-black">Modifier l'organisation</span>
+        </h1>
+    </section>
+
+    {% include 'front/organism/_form.organism.html.twig' with { 'form' : form }  %}
+{% endblock %}

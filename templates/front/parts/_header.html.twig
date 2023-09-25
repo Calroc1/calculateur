@@ -1,0 +1,107 @@
+<header class="fixed z-40 lg:relative lg:z-0 bg-lightgrey lg:bg-transparent w-full py-8 border-b border-white-verydark">
+	<div class="flex justify-between items-center max-w-full w-full h-14">
+		<div class="cursor-pointer lg:hidden">
+			<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 42 42"><line x1="2" y1="7.5" x2="40" y2="7.5" style="stroke:#fcc7a4;stroke-linecap:round;stroke-miterlimit:10;stroke-width:4px"/><line x1="2" y1="21.5" x2="40" y2="21.5" style="stroke:#fcc7a4;stroke-linecap:round;stroke-miterlimit:10;stroke-width:4px"/><line x1="2" y1="34.5" x2="40" y2="34.5" style="stroke:#fcc7a4;stroke-linecap:round;stroke-miterlimit:10;stroke-width:4px"/></svg>
+		</div>
+
+		<div class="hidden lg:flex items-center">
+{#			<form class="relative flex items-center mr-5 xl:mr-10" action="" method="post">#}
+{#				<input class="text-xs h-10 py-2 pl-6 pr-12 rounded-lg" name="search" type="text" placeholder="Rechercher...">#}
+{#				<button class="flex justify-center items-center absolute right-0 cursor-pointer h-full w-12" type="submit">#}
+{#					<svg width="20" height="20" viewbox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">#}
+{#						<path fill-rule="evenodd" clip-rule="evenodd" d="M1.66139 2.95249C3.14722 1.08974 5.36478 0.0252686 7.73765 0.0252686C9.82221 0.0252686 11.7737 0.823598 13.2373 2.30938C15.7876 4.88179 16.2533 8.80694 14.324 11.8894L14.2353 12.0225L19.5131 17.3004C19.8014 17.6109 19.9567 17.9878 19.9567 18.4092C19.9567 18.8306 19.7792 19.2297 19.4688 19.5402C18.8922 20.1389 17.8499 20.1389 17.2733 19.5402L12.0176 14.2401L11.8846 14.3288C10.6427 15.105 9.20126 15.5264 7.73765 15.5264C5.43133 15.5264 3.23589 14.5062 1.75011 12.71C-0.534046 9.93795 -0.57838 5.74667 1.66139 2.95249ZM7.73765 13.3087C9.20126 13.3087 10.5984 12.7321 11.6406 11.6899C12.6829 10.6476 13.2595 9.25051 13.2595 7.78689C13.2595 6.32328 12.6829 4.92617 11.6406 3.88391C10.5984 2.84166 9.22343 2.26509 7.73765 2.26509C6.27403 2.26509 4.87697 2.84166 3.83467 3.88391C2.79241 4.92617 2.21584 6.30107 2.21584 7.78689C2.21584 9.25051 2.79241 10.6476 3.83467 11.6899C4.87697 12.7322 6.25187 13.3087 7.73765 13.3087Z" fill="#D3CECB"/>#}
+{#					</svg>#}
+{#				</button>#}
+{#			</form>#}
+			<button id="btn-contact" class="btn btn--primary">Nous contacter</button>
+		</div>
+		<div class="flex justify-between lg:justify-start items-center h-full lg:h-auto">
+{#			{% if app.user.organism.lvl == 0 %}#}
+{#				<div class="mr-6 xl:mr-12 italic text-md">#}
+{#					<p class="whitespace-nowrap text-grey-light">Vous pouvez lancer encore</p>#}
+{#					<p class="text-right font-black">{{ app.user.organism.tokens }} campagne{% if app.user.organism.eldest.tokens > 1%}s{% endif %}</p>#}
+{#				</div>#}
+{#			{% endif %}#}
+{#			<div x-data="dropdown" class="lg:py-4 lg:relative" @click.outside="open = false">#}
+{#				<div @click="toggle" class="relative flex items-center justify-center rounded-lg bg-primary cursor-pointer p-2 w-10">#}
+{#					<span class="absolute -right-3 -top-3 w-6 h-6 text-center text-xs leading-5 rounded-full bg-lightblue text-white bg-secondary border-2 border-white ">42</span>#}
+{#					<svg width="24" height="24" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">#}
+{#						<path fill-rule="evenodd" clip-rule="evenodd" d="M16.2962 20C16.1784 22.2286 14.3001 24 12.0001 24C9.70008 24 7.82183 22.2286 7.70401 20H2.94791C1.32005 20 0 18.7074 0 17.1111C0 15.592 1.19762 14.3447 2.71698 14.2307V9.11078C2.71698 4.07774 6.87256 0 12 0C17.1275 0 21.283 4.07873 21.283 9.11078V14.2308C22.8004 14.3449 24 15.5916 24 17.1111C24 18.7057 22.6791 20 21.0521 20H16.2962ZM9.9748 20C10.0875 21.0001 10.9512 21.7778 12.0001 21.7778C13.049 21.7778 13.9127 21 14.0254 20H9.9748ZM19.0189 14.4436C19.0189 15.5508 19.9299 16.4444 21.0557 16.4444C21.4294 16.4444 21.7359 16.7447 21.7358 17.1111C21.7358 17.4775 21.4294 17.7778 21.0521 17.7778H2.94782C2.56929 17.7778 2.26415 17.4789 2.26415 17.1111C2.26415 16.7441 2.56948 16.4444 2.94432 16.4444C4.06828 16.4444 4.98113 15.5479 4.98113 14.4436V9.11069C4.98113 5.30503 8.12283 2.22214 12 2.22214C15.8771 2.22214 19.0189 5.30585 19.0189 9.11069V14.4436Z" fill="white"/>#}
+{#					</svg>#}
+{#				</div>#}
+{#				{% set items =#}
+{#                    	[#}
+{#                            {#}
+{#                                title: 'Montre',#}
+{#                                state: 'STARTED',#}
+{#                                date: '6',#}
+{#								readed: 'Nouveau',#}
+{#                                link: "#"#}
+{#                            },#}
+{#                            {#}
+{#                                title: 'Bijoux 3',#}
+{#                                state: 'COMPLETED',#}
+{#                                date: '7',#}
+{#								readed: 'Lu aujourd\'hui',#}
+{#                                link: "#"#}
+{#                            },#}
+{#							{#}
+{#                                title: 'Bijoux 1',#}
+{#                                state: 'FINISHED',#}
+{#                                date: '10',#}
+{#								readed: 'Lu il y a 2j',#}
+{#                                link: "#"#}
+{#                            },#}
+{#                        ]#}
+{#                    %}#}
+
+{#				<div x-cloak :class="open ? '' : 'hidden'" class="scrollbar absolute right-0 top-full bg-white overflow-y-auto h-56 py-2 rounded-lg shadow-lg">#}
+{#					<ul class="notifs notifs__header flex flex-col items-start gap-y-1">#}
+{#						{% for item in items %}#}
+{#							<li class="notif notif--{{item.state}} flex justify-between items-end relative w-full px-8 py-1 my-2">#}
+{#								<a href="{{ item.link }}" class="flex flex-col w-44">#}
+{#									<p class="text-black text-base font-medium">Campagne <span class="font-bold">{{ item.title }}</span></p>#}
+{#									<p class="text-xs font-medium">#}
+{#										{% if item.state == "STARTED" %}#}
+{#											Démarre dans {{item.date}} jours#}
+{#										{% elseif item.state == "COMPLETED" %}#}
+{#											Terminé dans {{item.date}} jours#}
+{#										{% elseif item.state == "FINISHED" %}#}
+{#											Reste {{item.date}} jours pour saisir#}
+{#										{% endif %}#}
+{#									</p>#}
+{#								</a>#}
+{#								<a href="#" class="flex flex-col items-end">#}
+{#									<span class="w-5 h-5">#}
+{#										{{includeSVG('btn-trash.svg')}}#}
+{#									</span>#}
+{#									<p class="mt-1 text-grey-light text-xs font-light whitespace-nowrap">{{item.readed}}</p>#}
+{#								</a>#}
+{#							</li>#}
+{#						{% endfor %}#}
+{#					</ul>#}
+{#				</div>#}
+{#			</div>#}
+			<div class="group flex justify-end lg:justify-start w-full relative ml-6 xl:ml-20 py-4">
+				<div class="hidden lg:flex flex-row items-end cursor-pointer">
+					<div class="text-md uppercase italic mr-2 xl:mr-4">
+						<p class="text-darkgrey text-grey-light font-bold whitespace-nowrap">{{ app.user }}</p>
+						<p class="text-darkblue text-right font-black whitespace-nowrap">{{app.user.organism.name}}</p>
+					</div>
+					<div class="transition duration-300 transform group-hover:rotate-90">
+						<svg width="40" height="40" viewbox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path fill-rule="evenodd" clip-rule="evenodd" d="M34.7993 14.1813L37.9225 14.8756C39.0989 15.1366 39.9371 16.1808 39.9372 17.3867V21.6649C39.9372 22.8707 39.0989 23.9143 37.9225 24.1759L34.7993 24.8689L34.2908 26.0981L36.0077 28.7973C36.6553 29.8144 36.5095 31.1447 35.6566 31.997L32.632 35.0221C32.1357 35.5184 31.4771 35.7758 30.8128 35.7758C30.336 35.7758 29.8569 35.644 29.4323 35.3732L26.7325 33.6557L25.504 34.1642L24.8109 37.2874C24.5487 38.4638 23.5052 39.3021 22.2993 39.3021H18.0211C16.8153 39.3021 15.7717 38.4645 15.5107 37.288L14.8159 34.1642L13.5867 33.6557L10.8869 35.3726C10.4629 35.6435 9.98193 35.7752 9.50522 35.7752C8.84098 35.7752 8.17981 35.5184 7.68349 35.0221L4.65345 31.9976C3.80051 31.1446 3.64483 29.8144 4.29251 28.7972L5.98992 26.098L5.44091 24.8689L2.23808 24.1758C1.06106 23.9143 0.0628662 22.8701 0.0628662 21.6642V17.386C0.0628662 16.1802 1.06098 15.1366 2.23808 14.8756L5.52114 14.1813L6.02969 12.9528L4.3122 10.2549C3.66514 9.23773 3.81094 7.90808 4.66389 7.05577L7.68843 4.0331C8.18475 3.53679 8.84342 3.28494 9.50828 3.28494C9.98506 3.28494 10.4642 3.42714 10.8888 3.69734L13.588 5.43569L14.8165 4.96691L15.5095 1.924C15.7717 0.747533 16.8153 0.0704346 18.0211 0.0704346H22.2993C23.5052 0.0704346 24.5487 0.746905 24.8109 1.924L25.504 4.88604L26.7331 5.39522L29.4323 3.6771C29.8569 3.40691 30.3361 3.27514 30.8128 3.27514C31.477 3.27514 32.1357 3.53185 32.632 4.02879L35.6566 7.05389C36.5095 7.9062 36.6554 9.23647 36.0077 10.2543L34.2908 12.9522L34.7993 14.1813ZM32.9347 22.6483L37.3643 21.6649H37.3644V17.3867L32.9349 16.4081L31.4018 12.7102L33.8381 8.89279L30.8135 5.88785L26.9851 8.36455L23.2835 6.91177L22.2994 2.64338H18.0212L17.0328 6.91177L13.3257 8.28432L9.48742 5.84745L6.44271 8.87255L8.83855 12.7004L7.22522 16.4026L2.63518 17.386V21.6642L7.22522 22.6483L8.91887 26.3499L6.48255 30.1784L9.50765 33.2029L13.3355 30.7666L17.0371 32.2997L18.0211 36.7293H22.2993L23.2827 32.2997L26.9849 30.7666L30.8134 33.2035L33.8379 30.1784L31.4016 26.3499L32.9347 22.6483Z" fill="#D3CECB"/>
+							<path fill-rule="evenodd" clip-rule="evenodd" d="M9.50269 19.5252C9.50269 13.6391 14.2741 8.86768 20.1608 8.86768C26.0462 8.86768 30.8177 13.639 30.8177 19.5257C30.8177 25.4118 26.0462 30.1827 20.1602 30.1827C14.2741 30.1827 9.50269 25.4112 9.50269 19.5252ZM12.0756 19.5251C12.0756 23.9834 15.7018 27.6096 20.1602 27.6096C24.6179 27.6096 28.2447 23.9834 28.2447 19.5257C28.2447 15.0674 24.6185 11.4405 20.1608 11.4405C15.7024 11.4405 12.0756 15.0674 12.0756 19.5251Z" fill="#D3CECB"/>
+						</svg>
+					</div>
+				</div>
+				<div class="hidden group-hover:block absolute right-0 top-full bg-white rounded-lg shadow-lg px-5 py-3">
+					<div class="flex flex-col gap-y-2 text-md font-bold">
+						<a href="{{ path('front_profile') }}">Mon profil</a>
+						<a href="{{ path('front_security_logout') }}">Se déconnecter</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</header>

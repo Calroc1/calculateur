@@ -1,0 +1,289 @@
+name: digital_internet
+label: Site internet
+color: '#4BC0C0'
+referential: Bilobay
+type: Internet
+children:
+- name: conception
+  phase: conception
+  label: Conception - création de la campagne
+  type: collection
+  unit: prestataire  
+  renamable: true
+  children:
+    - name: temps_interne
+      label: Temps de conception en interne
+      type: integer
+      unit: jours.homme
+      help: Ce poste regroupe les émissions fixes de l'activité (énergie, fret, déplacements
+        domicile-travail des salariés, déplacements des visiteurs, intrants, déchets,
+        amortissements)
+    - name: temps_externe
+      label: Temps passé des prestataires extérieurs (directeur artistique, consultant...),
+        basé sur la durée de leur prestation
+      type: integer
+      unit: jours.homme
+    - name: visio
+      label: Visio pour la conception
+      type: section
+      display: table
+      children:
+      - name: temps
+        label: Durée
+        type: integer
+        unit: heures
+      - name: participants
+        label: Nombre moyen de participants
+        type: integer
+    - name: deplacements
+      label: Déplacements clients-agence et agence-clients, prestataire-agence et
+        agence-prestataire ou régie-agence et agence-régie
+      type: section
+      display: table
+      percentage: true
+      children:
+      - name: voiture
+        label: En voiture
+        type: integer
+        unit: km
+      - name: avion
+        label: En avion
+        type: integer
+        unit: km
+      - name: train
+        label: En train
+        type: integer
+        unit: km
+    - name: hotel
+      label: Nuitées d’hotel
+      type: integer
+      unit: nuitées
+- name: shooting
+  phase: production
+  label: Shooting
+  type: collection
+  unit: shooting
+  default: entry
+  children:
+    - name: temps_externe
+      label: Temps passé pour le shooting des prestataires extérieurs (freelance,
+        photographe, mannequin...), basé sur la durée de leur prestation
+      type: integer
+      unit: jours.homme
+    - name: visio
+      label: Visio pour le shooting
+      type: section
+      display: table
+      children:
+      - name: temps
+        label: Durée
+        type: integer
+        unit: heures
+      - name: participants
+        label: Nombre moyen de participants
+        type: integer
+    - name: deplacements
+      label: Déplacements vers le lieu du shooting, prestataire-agence et agence-prestataire
+        ou régie-agence et agence-régie
+      type: section
+      display: table
+      percentage: true
+      children:
+      - name: voiture
+        label: En voiture
+        type: integer
+        unit: km
+      - name: avion
+        label: En avion
+        type: integer
+        unit: km
+      - name: train
+        label: En train
+        type: integer
+        unit: km
+    - name: hotel
+      label: Nuitées d’hotel
+      type: integer
+      unit: nuitées
+- name: video
+  phase: production
+  label: Tournage
+  type: collection
+  unit: tournage
+  default: entry
+  children:
+  - name: temps_externe
+    label: Temps passé pour le tournage des prestataires extérieurs (production,
+      tournage, postproduction, montage, comédiens, stylisme…), basé sur la durée
+      de leur prestation
+    type: integer
+    unit: jours.homme
+  - name: visio
+    label: Visio pour le tournage
+    type: section
+    display: table
+    children:
+    - name: temps
+      label: Durée
+      type: integer
+      unit: heures
+    - name: participants
+      label: Nombre moyen de participants
+      type: integer
+  - name: deplacements
+    label: Déplacements repérage, tournage, post production
+    type: section
+    display: table
+    percentage: true
+    children:
+    - name: voiture
+      label: En voiture
+      type: integer
+      unit: km
+    - name: avion
+      label: En avion
+      type: integer
+      unit: km
+    - name: train
+      label: En train
+      type: integer
+      unit: km
+  - name: hotel
+    label: Nuitées d’hotel
+    type: integer
+    unit: nuitées
+- name: developpement
+  phase: production
+  label: Développement et production
+  type: section
+  children:
+  - name: site_internet
+    label: Site internet
+    type: collection
+    lvl: 1
+    unit: site web
+    children:
+    - name: temps_interne
+      label: Temps de production de l’équipe interne annonceur
+      type: integer
+      unit: jours.homme
+      help: Ce poste regroupe les émissions fixes de l'activité (énergie, fret, déplacements
+        domicile-travail des salariés, déplacements des visiteurs, intrants, déchets,
+        amortissements)
+    - name: temps_externe
+      label: Temps de production des prestataires extérieurs (directeur artistique,
+        développeur...), basé sur la durée de leur prestation
+      type: integer
+      unit: jours.homme
+    - name: visio
+      label: Visio pour la conception
+      type: section
+      display: table
+      children:
+      - name: temps
+        label: Durée
+        type: integer
+        unit: heures
+      - name: participants
+        label: Nombre moyen de participants
+        type: integer
+    - name: deplacements
+      label: Déplacements clients-agence et agence-clients, prestataire-agence et
+        agence-prestataire ou régie-agence et agence-régie
+      type: section
+      display: table
+      percentage: true
+      children:
+      - name: voiture
+        label: En voiture
+        type: integer
+        unit: km
+      - name: avion
+        label: En avion
+        type: integer
+        unit: km
+      - name: train
+        label: En train
+        type: integer
+        unit: km
+    - name: hotel
+      label: Nuitées d’hotel
+      type: integer
+      unit: nuitées
+- name: diffusion
+  phase: diffusion
+  label: Diffusion
+  type: section
+  children:
+  - name: site_internet
+    label: Site internet
+    type: collection
+    unit: site web
+    lvl: 1
+    children:
+    - name: envoi
+      label: Envoi
+      type: section
+      display: table
+      help: On considère le poids moyen d'une page web = 1,9 Mo
+      children:
+      - name: poids
+        label: Poids total
+        type: integer
+        unit: Mo
+      - name: nb_pages_total
+        label: Nombre de pages totales
+        type: integer
+      - name: nb_pages_visitees
+        label: Nombre de pages visitées
+        type: integer
+      - name: nb_visiteurs
+        label: Nombre de visiteurs
+        type: integer
+    - name: visionnage
+      label: Visionnage
+      type: section
+      addendum: 'Site internet : nous considérons un visionnage complet des sites
+        (hypothèse conservatrice)'
+      children:
+      - name: temps_lecture_moyen
+        label: Temps de lecture moyen
+        type: integer
+        unit: sec
+      - name: repartition
+        label: Répartition des appareils de visionnage
+        type: section
+        display: table
+        children:
+        - name: smartphone
+          label: Smartphone
+          type: integer
+          unit: "%"
+        - name: tablette
+          label: Tablette
+          type: integer
+          unit: "%"
+        - name: ordi_fixe
+          label: Ordinateur fixe
+          type: integer
+          unit: "%"
+        - name: ordi_portable
+          label: Ordinateur portable
+          type: integer
+          unit: "%"
+        - name: tv
+          label: TV connectée
+          type: integer
+          unit: "%"
+    - name: stockage
+      label: Stockage
+      type: section
+      display: table
+      children:
+      - name: localization
+        label: Hébergeur
+        type: country
+      - name: duree
+        label: Durée d'hébergement
+        type: integer
+        unit: mois

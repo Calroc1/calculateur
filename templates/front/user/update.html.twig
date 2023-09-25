@@ -1,0 +1,13 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Modifier le collaborateur{% endblock %}
+
+{% block body %}
+    <section class="col-span-full mt-6 lg:mt-14">
+        <h1 class="text-3xl font-medium leading-extra-loose w-full text-grey-light">
+            Mon entreprise<span class="font-normal mx-5">|</span><span class="font-bold text-black">Modifier le collaborateur</span>
+        </h1>
+    </section>
+
+    {% include 'front/user/_form.user.html.twig' with { 'form' : formUpdate } %}
+{% endblock %}

@@ -1,0 +1,282 @@
+{% set supports = getEnabledSupports() %}
+<div class="col-span-6 xl:col-span-4">
+    <div class="rounded-lg bilan-version-campaign relative {{ compareVariants and campaign.chosenVariant and campaign.chosenVariantIndex != variantIndex  ? 'disabled' : '' }}">
+        {% if compareVariants == false %}
+            <div class="close absolute flex justify-center items-center right-0 top-0 transform -translate-y-full cursor-pointer bg-white w-11 h-9 rounded-t-lg">
+                {{ includeSVG('cross-grey.svg') }}
+            </div>
+        {% endif %}
+        <div class="py-6 px-5 text-lg bg-white rounded-tl-lg {% if compareVariants %}rounded-tr-lg{% endif %}">
+            <div class="font-black flex items-center title">{{ name }}</div>
+            <div>Date de création {{ dateCreation|date("d/m/Y") }}</div>
+            <div class="italic text-sm">
+                {% if author %}
+                    Créé(e) par {{ author }}
+                {% else %}
+                    &nbsp;
+                {% endif %}
+            </div>
+        </div>
+        {% if app.user.status == 'SUPERVISOR' %}
+            {% if (campaign.notionBudget is same as(constant('App\\Entity\\Campaign\\Campaign::NOTION_BUDGET_YES_CAMPAIGN')) or campaign.notionBudget is same as(constant('App\\Entity\\Campaign\\Campaign::NOTION_BUDGET_YES_MEDIA')) and budgets is defined) %}
+                <div x-data="dropdown" x-init="open = true" class="mb-10 infos box-shadow">
+                    <div class="py-7 px-5 bg-primary text-white">
+                        <div class="flex flex-row flex-nowrap items-center text-3xl relative">
+                            <div @click="toggle" class="cursor-pointer flex flex-row flex-nowrap items-center">
+                                <div class="font-light">Budget</div>
+                                <div :class="open ? 'rotate-45' : '-rotate-45'" class="transition transform border-white border-solid border-2 border-t-0 border-l-0 w-2.5 h-2.5 ml-2.5"></div>
+                            </div>
+
+                            <div class="bg-white h-px flex-1 transform translate-x-5"></div>
+                        </div>
+
+                        <div x-cloak x-show="open" class="mt-2.5">
+                            <div class="text-6xl leading-none text-center same-h-1">{{ budgets.global|number_format(0, '.', ' ') }} € HT</div>
+                        </div>
+                    </div>
+
+                    {% if campaign.notionBudget is same as(constant('App\\Entity\\Campaign\\Campaign::NOTION_BUDGET_YES_MEDIA')) %}
+                        <div x-cloak x-show="open" class="px-5 lg:px-10 py-7 bg-white same-h-2">
+                            <div class="px-3">
+                                <h4 class="font-black text-base leading-none">En Euros (HT)</h4>
+                            </div>
+
+                            <div class="stat flex flex-row mb-10">
+                                <div class="px-3 w-full">
+                                    {% for support in supports %}
+                                        {% set nameSupport = support.name %}
+                                        <div class="stat__{{ nameSupport }} mt-1">
+                                            <div class="text-2xs flex flex-row flex-nowrap justify-between items-end mb-1">
+                                                <div class="text-black">{{ support.label }}</div>
+
+                                                {% set supportTotal = nameSupport in budgets|keys ? budgets[nameSupport] : [] %}
+
+                                                <div>{{ supportTotal|number_format(0, '.', ' ') }}</div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <canvas class="chart-radio-bilan" height="250" data-budget="1">
+                                {% for key, budget in budgets|slice(1) %}
+                                    <div class="stat" data-name="{{ key }}" data-stat="{{ getPercent(budget, budgets.global) }}"></div>
+                                {% endfor %}
+                            </canvas>
+                        </div>
+                    {% else %}
+                        <div x-cloak x-show="open" class="px-5 lg:px-10 py-7 bg-white same-h-2">
+                            <div class="px-3">
+                                <h4 class="font-black text-base leading-none">Indicateur non considéré pour la campagne</h4>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div x-data="dropdown" x-init="open = true" class="mb-10 infos box-shadow">
+                    <div class="py-7 px-5 bg-primary text-white">
+                        <div class="flex flex-row flex-nowrap items-center text-3xl relative">
+                            <div @click="toggle" class="cursor-pointer flex flex-row flex-nowrap items-center">
+                                <div class="font-light">Budget</div>
+                                <div :class="open ? 'rotate-45' : '-rotate-45'" class="transition transform border-white border-solid border-2 border-t-0 border-l-0 w-2.5 h-2.5 ml-2.5"></div>
+                            </div>
+
+                            <div class="bg-white h-px flex-1 transform translate-x-5"></div>
+                        </div>
+
+                        <div x-cloak x-show="open" class="mt-2.5">
+                            <div class="text-2xl leading-none text-center same-h-1">Indicateur non considéré pour la campagne</div>
+                        </div>
+                    </div>
+
+                    <div x-cloak x-show="open" class="px-5 lg:px-10 py-7 bg-white same-h-2">
+                        <div class="px-3">
+                            <h4 class="font-black text-base leading-none">Indicateur non considéré pour la campagne</h4>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+
+        {% set supportsTotal = [] %}
+        {% for stat in statistics %}
+            {% set supportsTotal = supportsTotal|merge([getTotal(stat)]) %}
+        {% endfor %}
+        {% set bilanTotal = toTons(getTotal(supportsTotal)) %}
+        <div x-data="dropdown" x-init="open = true" class="mb-10 infos box-shadow">
+            <div class="py-7 px-5 bg-primary text-white">
+                <div class="flex flex-row flex-nowrap items-center text-3xl relative">
+                    <div @click="toggle" class="cursor-pointer flex flex-row flex-nowrap items-center">
+                        <div class="font-light">Bilan global</div>
+                        <div :class="open ? 'rotate-45' : '-rotate-45'" class="transition transform border-white border-solid border-2 border-t-0 border-l-0 w-2.5 h-2.5 ml-2.5"></div>
+                    </div>
+                    <div class="bg-white h-px flex-1 transform translate-x-5"></div>
+                </div>
+                <div x-cloak x-show="open" class="mt-2.5">
+                    <div class="text-13xl leading-none text-center">{{ bilanTotal }}</div>
+                    <div class="text-sm text-center">tonnes équ. CO₂</div>
+                </div>
+            </div>
+            <div x-cloak x-show="open" class="px-5 lg:px-10 py-7 bg-white">
+                <div class="px-3">
+                    <h4 class="font-black text-base leading-none">Empreinte carbone</h4>
+                    <div class="text-2xs">tonnes CO₂ eq</div>
+                </div>
+
+                <div class="stat flex flex-row mb-10">
+                    <div class="px-3 w-full lg:w-1/2">
+                        {% set counter = 1 %}
+                        {% for support in supports %}
+                            {% set nameSupport = support.name %}
+                                <div class="stat__{{ nameSupport }} mt-1">
+                                    <div class="text-2xs flex flex-row flex-nowrap justify-between items-end mb-1">
+                                        <div class="text-black">{{ support.label }}</div>
+                                        {% set supportSections = nameSupport in statistics|keys ? statistics[nameSupport] : [] %}
+                                        {% set supportTotal = toTons(getTotal(supportSections)) %}
+                                        <div>{{ supportTotal }}</div>
+                                    </div>
+                                </div>
+                                {% if counter is divisible by((supports|length/2)|round) and counter != supports|length %}
+                                    </div>
+                                    <div class="px-3 w-full lg:w-1/2">
+                                {% endif %}
+                                {% set counter = counter + 1 %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <canvas class="chart-radio-bilan mb-10" height="250">
+                    {% for support in supports %}
+                        {% set nameSupport = support.name %}
+                        {% set supportSections = nameSupport in statistics|keys ? statistics[nameSupport] : [] %}
+                        {% set supportTotal = toTons(getTotal(supportSections)) %}
+                        <div class="stat" data-name="{{ nameSupport }}" data-stat="{{ getPercent(supportTotal, bilanTotal) }}"></div>
+                    {% endfor %}
+                </canvas>
+
+                {% if campaign.hasNotionMediaEfficiency is same as(true) and contacts is defined %}
+                    {% set totalContacts = 0 %}
+
+                    {% for key, contact in contacts %}
+                        {% set totalContacts = totalContacts + contact.contacts %}
+                    {% endfor %}
+
+                    <div class="same-h-3">
+                        {% if totalContacts > 0 %}
+                            <div class="px-3">
+                                <h4 class="font-black text-base leading-none">Émissions par contacts</h4>
+                                <div class="text-2xs">en g CO₂ eq / contact</div>
+                            </div>
+
+                            <div class="stat flex flex-row mb-10">
+                                <div class="px-3 w-full lg:w-1/2">
+                                    {% set counter = 1 %}
+                                    {% for nameSupport, support in supports %}
+                                        <div class="stat__{{ nameSupport }} mt-1">
+                                            <div class="text-2xs flex flex-row flex-nowrap justify-between items-center mb-1">
+                                                <div class="text-black">{{ support.label }}</div>
+
+                                                {% set supportSections = nameSupport in contacts|keys ? contacts[nameSupport] : [] %}
+                                                {% set supportTotal = supportSections.contacts is defined and supportSections.contacts > 0 ? toGrams(getTotal(statistics[nameSupport]) / supportSections.contacts)|round(2) : 0 %}
+
+                                                <div class="text-right">{{ supportTotal == 0 ? "Champ non renseigné" : supportTotal }}</div>
+                                            </div>
+                                        </div>
+                                        {% if counter is divisible by((supports|length/2)|round) and counter != supports|length %}
+                                            </div>
+                                            <div class="px-3 w-full lg:w-1/2">
+                                        {% endif %}
+                                        {% set counter = counter + 1 %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <canvas class="chart-bar-bilan" height="250" data-contact="1">
+                                {% for key, contact in contacts %}
+                                    <div class="stat" data-name="{{ key }}" data-stat="{{ contact.contacts > 0 ? (toGrams(getTotal(statistics[key])) / contact.contacts)|round(2) : 0 }}"></div>
+                                {% endfor %}
+                            </canvas>
+                        {% else %}
+                            <div class="px-3">
+                                <h4 class="font-black text-base leading-none">Émissions par contacts</h4>
+                                <div class="text-2xs">en g CO₂ eq / contact</div>
+                            </div>
+
+                            <div class="px-3 mt-5">
+                                <h4 class="font-black leading-none">Indicateur non considéré pour la campagne</h4>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                <div class="text-center mt-7">
+                    <a href="{{ path('front_campaign_update', {
+                        campaign: campaign.id,
+                        variantIndex: variantIndex,
+                        step : 'bilan'
+                    }) }}" class="btn btn--primary btn--little">Détails</a>
+                </div>
+            </div>
+        </div>
+        {# FOR ALL SUPPORTS POSSIBLE CHECK IF SUPPORT IS IN ONE OF VARIANT OR MORE #}
+        {% for support in supports %}
+            {% set nameSupport = support.name %}
+            {% set supportSections = nameSupport in statistics|keys ? statistics[nameSupport] : [] %}
+            {% set supportTotal = getTotal(supportSections) %}
+            <div x-data="dropdown" class="mb-10 infos box-shadow">
+                <div class="py-7 px-5 bg-primary text-white">
+                    <div class="flex flex-row flex-nowrap items-center text-3xl relative">
+                        <div @click="toggle" class="cursor-pointer flex flex-row flex-nowrap items-center">
+                            <div class="font-light">{{ support.label }}</div>
+                            <div :class="open ? 'rotate-45' : '-rotate-45'" class="transition transform border-white border-solid border-2 border-t-0 border-l-0 w-2.5 h-2.5 ml-2.5"></div>
+                        </div>
+                        <div class="bg-white h-px flex-1 transform translate-x-5"></div>
+                    </div>
+                    <div x-cloak x-show="open" class="mt-2.5">
+                        <div class="text-xs">
+                            <span class="text-lg font-bold">{{ supportTotal }}</span> kgéqCO₂ <span class="text-lg font-bold">{{ toTons(supportTotal) }}</span> téqCO₂ (3)<br>
+                            <span class="italic">soit {{ toKmVoiture(toTons(supportTotal)) }} km en voiture (1)</span><br>
+                            <span class="italic">soit {{ toAnneesEmissionFr(toTons(supportTotal)) }} années d’émissions d’un français (2)</span>
+                        </div>
+                    </div>
+                </div>
+                <div x-cloak x-show="open" class="px-5 lg:px-10 py-7 bg-white">
+                    <canvas class="chart-radio-bilan" height="250">
+                        {% for nameSection, section in supportSections %}
+                            <div class="stat stat--sub" data-name="{{ nameSupport }}" data-label="{{ nameSection }}" data-stat="{{ getPercent(section, supportTotal) }}"></div>
+                        {% endfor %}
+                    </canvas>
+                    <div class="text-center mt-7">
+                        <a href="{{ path('front_campaign_update', {
+                            campaign: campaign.id,
+                            variantIndex: variantIndex,
+                            step : nameSupport,
+                        }) }}" class="btn btn--primary btn--little {{ nameSupport in statistics|keys ? '' : 'btn--disabled' }}">Modifier</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    {% if compareVariants %}
+        <form action="{{ path('front_campaign_variant_choose', {
+            campaign: campaign.id
+        }) }}" method="post">
+            <input type="hidden" value="{{ variantIndex }}" name="variantIndex">
+            <button type="submit" class="group rounded-lg mt-8 w-full flex items-stretch justify-between overflow-hidden font-bold bg-white text-left">
+                <span class="py-5 pl-6 pr-3">
+                    {% if campaign.chosenVariant and campaign.chosenVariantIndex == variantIndex %}
+                        Ne plus choisir cette variante de campagne
+                    {% else %}
+                        Choisir cette variante de campagne
+                    {% endif %}
+                </span>
+                <span class="w-16 flex justify-center items-center transition bg-primary group-hover:bg-secondary">
+                    {% if campaign.chosenVariant and campaign.chosenVariantIndex == variantIndex %}
+                        {{ includeSVG('cross.svg') }}
+                    {% else %}
+                        {{ includeSVG('check-big.svg') }}
+                    {% endif %}
+                </span>
+            </button>
+        </form>
+    {% endif %}
+</div>

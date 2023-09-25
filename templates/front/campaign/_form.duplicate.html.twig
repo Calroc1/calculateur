@@ -1,0 +1,12 @@
+{% form_theme form 'front/forms/main.html.twig' %}
+{{ form_start(form, { 'attr' : { 'id' : 'form-campaign' } }) }}
+    {{ form_row(form.originCampaign) }}
+    {% if form.vars.with_submit %}
+        <div class="text-center">
+            <button type="submit" class="btn btn--little btn--primary">
+                Créer
+            </button>
+        </div>
+    {% endif %}
+    <input type="submit" class="hidden">
+{{ form_end(form) }}

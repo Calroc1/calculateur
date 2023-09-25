@@ -1,0 +1,132 @@
+- 
+  name: Conception
+  path: conception
+  formula: |
+    ( __FIELD[temps_interne]__ * __EMISSION[temps_conception]__ )
+    + ( __FIELD[temps_externe]__ * __EMISSION[temps_conception]__ )
+    + ( (__FIELD[visio.temps]__ * 60 * __FIELD[visio.participants]__) * __EMISSION[visio]__ / 1000)
+    + ( 
+          (__FIELD[deplacements.voiture]__ * __EMISSION[deplacements.voiture]__) 
+        + (__FIELD[deplacements.avion]__ * __EMISSION[deplacements.avion]__)
+        + (__FIELD[deplacements.train]__ * __EMISSION[deplacements.train]__)
+        + (__FIELD[hotel]__ * __EMISSION[deplacements.hotel]__)
+    )
+-
+  name: Shooting
+  path: shooting
+  formula: |
+      + ( __FIELD[temps_externe]__ * __EMISSION[temps_conception]__ )
+      + ( (__FIELD[visio.temps]__ * 60 * __FIELD[visio.participants]__) * __EMISSION[visio]__ / 1000 )
+      + ( 
+            (__FIELD[deplacements.voiture]__ * __EMISSION[deplacements.voiture]__) 
+            + (__FIELD[deplacements.avion]__ * __EMISSION[deplacements.avion]__)
+            + (__FIELD[deplacements.train]__ * __EMISSION[deplacements.train]__)
+            + (__FIELD[hotel]__ * __EMISSION[deplacements.hotel]__)
+      )
+- 
+  name: Vidéo
+  path: video
+  formula: |
+      + ( __FIELD[temps_externe]__ * __EMISSION[temps_conception]__ )
+      + ( (__FIELD[visio.temps]__ * 60 * __FIELD[visio.participants]__) * __EMISSION[visio]__ / 1000 )
+      + ( 
+            (__FIELD[deplacements.voiture]__ * __EMISSION[deplacements.voiture]__) 
+            + (__FIELD[deplacements.avion]__ * __EMISSION[deplacements.avion]__)
+            + (__FIELD[deplacements.train]__ * __EMISSION[deplacements.train]__)
+            + (__FIELD[hotel]__ * __EMISSION[deplacements.hotel]__)
+      )
+-
+  name: Développement et production
+  path: developpement
+  children:
+    -
+      path: bannieres
+      formula: |
+            ( __FIELD[temps_interne]__ * __EMISSION[temps_conception]__ )
+            + ( __FIELD[temps_externe]__ * __EMISSION[temps_conception]__ )
+            + ( (__FIELD[visio.temps]__ * 60 * __FIELD[visio.participants]__) * __EMISSION[visio]__ / 1000)
+            + ( 
+                  (__FIELD[deplacements.voiture]__ * __EMISSION[deplacements.voiture]__) 
+                + (__FIELD[deplacements.avion]__ * __EMISSION[deplacements.avion]__)
+                + (__FIELD[deplacements.train]__ * __EMISSION[deplacements.train]__)
+                + (__FIELD[hotel]__ * __EMISSION[deplacements.hotel]__)
+            )  
+    -
+      path: videos
+      formula: |
+            ( __FIELD[temps_interne]__ * __EMISSION[temps_conception]__ )
+            + ( __FIELD[temps_externe]__ * __EMISSION[temps_conception]__ )
+            + ( (__FIELD[visio.temps]__ * 60 * __FIELD[visio.participants]__) * __EMISSION[visio]__ / 1000)
+            + ( 
+                  (__FIELD[deplacements.voiture]__ * __EMISSION[deplacements.voiture]__) 
+                + (__FIELD[deplacements.avion]__ * __EMISSION[deplacements.avion]__)
+                + (__FIELD[deplacements.train]__ * __EMISSION[deplacements.train]__)
+                + (__FIELD[hotel]__ * __EMISSION[deplacements.hotel]__)
+            )
+            + ( 
+                  (__FIELD[deplacements_post_production.voiture]__ * __EMISSION[deplacements.voiture]__) 
+                + (__FIELD[deplacements_post_production.avion]__ * __EMISSION[deplacements.avion]__)
+                + (__FIELD[deplacements_post_production.train]__ * __EMISSION[deplacements.train]__)
+                + (__FIELD[hotel_post_production]__ * __EMISSION[deplacements.hotel]__)
+            )
+-
+  name: Diffusion
+  path: diffusion
+  vars:
+    - 
+      name: reseau_transport
+      formula: |
+        (
+          (__EMISSION[consommation_electrique.reseau.filaire]__ * __EMISSION[web.transport.filaire]__)
+          + (__EMISSION[consommation_electrique.reseau.wifi]__ * __EMISSION[web.transport.wifi]__)
+          + (__EMISSION[consommation_electrique.reseau.mobile]__ * __EMISSION[web.transport.mobile]__)
+        ) / 100
+  children:
+    -
+      path: bannieres
+      vars:
+        -
+          name: poids
+          formula: __FIELD[envoi.poids]__ / 1000
+        -
+          name: envoi
+          formula: __VAR[poids]__ * __FIELD[envoi.nb_impressions]__ * __FCT[world_avg_conso]__ * __VAR[reseau_transport]__
+        -
+          name: visionnage
+          formula: | 
+            __FIELD[envoi.nb_impressions]__ * __FIELD[visionnage.temps_lecture_moyen]__ * __FCT[campaign_conso]__
+            * ( (
+                (__FIELD[visionnage.repartition.smartphone]__ * __FCT[device_avg_conso, smartphone]__)
+              + (__FIELD[visionnage.repartition.tablette]__ * __FCT[device_avg_conso, tablette]__)
+              + (__FIELD[visionnage.repartition.ordi_fixe]__ * __FCT[device_avg_conso, ordi_fixe]__)
+              + (__FIELD[visionnage.repartition.ordi_portable]__ * __FCT[device_avg_conso, ordi_portable]__)
+              + (__FIELD[visionnage.repartition.tv]__ * __FCT[device_avg_conso, tv]__)
+            ) / 100 )
+        -
+          name: stockage
+          formula: __VAR[poids]__ * __FIELD[stockage.nb_plateformes]__ * (__FIELD[stockage.duree]__/12) * __EMISSION[consommation_electrique.datacenters]__ * __FCT[world_avg_conso]__
+      formula:  __VAR[envoi]__ + __VAR[visionnage]__ + __VAR[stockage]__
+    -
+      path: videos
+      vars:
+        -
+          name: poids
+          formula: __FIELD[envoi.poids]__ / 60 / 1000
+        -
+          name: envoi
+          formula: __VAR[poids]__ * __FIELD[envoi.nb_vues]__ * __FIELD[envoi.duree]__ * __FCT[world_avg_conso]__ * __VAR[reseau_transport]__
+        -
+          name: visionnage
+          formula: | 
+            __FIELD[envoi.nb_vues]__ * __FIELD[visionnage.temps_lecture_moyen]__ * __FCT[campaign_conso]__
+            * ( (
+                (__FIELD[visionnage.repartition.smartphone]__ * __FCT[device_avg_conso, smartphone]__)
+              + (__FIELD[visionnage.repartition.tablette]__ * __FCT[device_avg_conso, tablette]__)
+              + (__FIELD[visionnage.repartition.ordi_fixe]__ * __FCT[device_avg_conso, ordi_fixe]__)
+              + (__FIELD[visionnage.repartition.ordi_portable]__ * __FCT[device_avg_conso, ordi_portable]__)
+              + (__FIELD[visionnage.repartition.tv]__ * __FCT[device_avg_conso, tv]__)
+            ) / 100 )
+        -
+          name: stockage
+          formula: __VAR[poids]__ * __FIELD[stockage.nb_plateformes]__ * (__FIELD[stockage.duree]__ / 12) * __EMISSION[consommation_electrique.datacenters]__ * __EMISSION[localization.__FIELD[stockage.localization]__]__
+      formula:  __VAR[envoi]__ + __VAR[visionnage]__ + __VAR[stockage]__

@@ -1,0 +1,131 @@
+{% use "form_div_layout.html.twig" %}
+
+{% block form_start -%}
+    {% set attr = attr|merge({'novalidate':'novalidate'}) %}
+    {{- parent() -}}
+{%- endblock form_start %}
+
+{%- block widget_attributes -%}
+    {% if errors|length > 0 %}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' border-2 border-red')|trim}) %}
+    {% endif %}
+    {{- parent() -}}
+{%- endblock widget_attributes -%}
+
+{%- block file_widget -%}
+    {% set class = 'block bg-white-dark rounded-lg text-xs font-light px-5 py-2 disabled:opacity-30 readonly:opacity-30' %}
+    {{ block("form_widget_simple") }}
+{%- endblock file_widget -%}
+
+{%- block color_widget -%}
+    {% set class = 'block bg-white-dark rounded-lg px-2 py-2 h-9' %}
+    {{- parent() -}}
+{%- endblock color_widget -%}
+
+{%- block date_widget -%}
+    {%- set type = type|default('date') -%}
+    {{- parent() -}}
+{%- endblock date_widget -%}
+
+{%- block textarea_widget -%}
+    {% set class = 'block bg-white-dark rounded-lg text-xs font-light px-5 py-2 h-36 disabled:opacity-30 readonly:opacity-30 w-full' %}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' ' ~ class)|trim}) %}
+    {{- parent() -}}
+{%- endblock textarea_widget -%}
+
+{%- block form_widget_simple -%}
+    {% if class is not defined %}
+        {% set class = 'block bg-white-dark rounded-lg text-xs font-light px-5 h-9 disabled:opacity-30 readonly:opacity-30 w-full' %}
+    {% endif %}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' ' ~ class)|trim}) %}
+    {{- parent() -}}
+{%- endblock form_widget_simple -%}
+
+{%- block choice_widget_collapsed -%}
+    {% set class = 'block bg-white-dark rounded-lg text-xs font-light px-5 h-9 disabled:opacity-30 readonly:opacity-30 w-full' %}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' ' ~ class)|trim}) %}
+    {{- parent() -}}
+{%- endblock choice_widget_collapsed -%}
+
+{%- block choice_widget_expanded -%}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' flex flex-row flex-wrap justify-start items-center w-full')|trim}) %}
+    <div {{ block('widget_container_attributes') }}>
+        {%- for child in form %}
+            {{ form_row(child) }}
+        {% endfor -%}
+    </div>
+{%- endblock choice_widget_expanded -%}
+
+{%- block checkbox_row -%}
+    <div class="input-radio mr-3">
+        {{- form_widget(form, { 'attr' : { 'class' : 'disabled:opacity-30 readonly:opacity-30' } }) -}}
+        {{- form_label(form, null) -}}
+    </div>  
+{%- endblock checkbox_row -%}
+
+{%- block checkbox_label -%}
+    {% set label_attr = label_attr|merge({'for': id}) %}
+    <label {% if label_attr %}{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}{% endif %}>{{- label -}}</label>
+{%- endblock checkbox_label -%}
+
+{%- block form_row -%}
+    {% set row_attr = row_attr|merge({class: (row_attr.class|default('') ~ ' my-2.5 mb-5')|trim}) %}
+    <div {% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %} class="">       
+        {{- form_label(form) -}}
+        {{- form_widget(form) -}} 
+        {{- form_errors(form) -}}
+    </div>
+{%- endblock form_row -%}
+
+{# LABELS #}
+{%- block form_label -%}
+   <div class="flex flex-row flex-nowrap justify-start items-center mb-2.5">
+        <label class="text-xs">{{ label }}</label>
+    </div> 
+{%- endblock form_label -%}
+
+{%- block form_errors -%}
+    {%- if errors|length > 0 -%}
+        <ul class="w-full">
+            {%- for error in errors -%}
+                <li class="block">
+                    <div class="flex my-2 items-center bg-red text-white px-4 py-3 mt-2.5" role="alert">
+                        {{ includeSVG('info.svg') }}
+                        <p>{{ error.message }}</p>
+                    </div>
+                </li>
+            {%- endfor -%}
+        </ul>
+    {%- endif -%}
+{%- endblock form_errors -%}
+
+{%- block datetime_widget -%}
+    {% if widget == 'single_text' %}
+        {{- block('form_widget_simple') -}}
+    {%- else -%}
+        <div {{ block('widget_container_attributes') }}>
+            {{- form_errors(form.date) -}}
+            {{- form_errors(form.time) -}}
+            <div class="flex">
+                <div class="mr-3">
+                    {{- form_widget(form.date) -}}
+                </div>
+                <div>
+                    {{- form_widget(form.time) -}}
+                </div>
+            </div>
+        </div>
+    {%- endif -%}
+{%- endblock datetime_widget -%}
+
+{%- block time_widget -%}
+    {%- if widget == 'single_text' -%}
+        {{ block('form_widget_simple') }}
+    {%- else -%}
+        {%- set vars = widget == 'text' ? { 'attr': { 'size': 1 }} : {} -%}        
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' flex')|trim}) %}
+        <div {{ block('widget_container_attributes') }}>
+            <div>{{ form_widget(form.hour, vars) }}</div>{% if with_minutes %}<div class="p-2">:</div><div>{{ form_widget(form.minute, vars) }}</div>{% endif %}{% if with_seconds %}<div class="p-2">:</div><div>{{ form_widget(form.second, vars) }}</div>{% endif %}
+        </div>
+    {%- endif -%}
+{%- endblock time_widget -%}

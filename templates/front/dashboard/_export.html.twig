@@ -1,0 +1,24 @@
+<div x-data="exportCampaigns" class="col-span-full mt-10">
+    <section class="col-span-full">
+        <div class="flex flex-nowrap flex-row justify-start items-center mb-2">
+            <div class="relative px-7">
+                <h2>Exports</h2>
+            </div>
+            <div class="bg-white-verydark h-px flex-1"></div>
+        </div>
+        <form action="{{ path('front_export_campaigns') }}" method="post" id="filters" class="flex flex-col flex-wrap xl:flex-row xl:justify-between items-start xl:items-end mb-7 xl:mb-10">
+            <div class="flex flex-row flex-wrap justify-start items-start">
+                {% include "front/parts/_filters_campaigns.html.twig" with { 'multiselect' : true } %}
+
+                <button type="submit" class="btn btn--primary min-w-0 mt-auto box-content relative" :class="isLoading && 'loading'">
+                    Générer
+                    <template x-if="isLoading">
+						<span class="loader">
+							<img class="mx-auto my-20 w-8" src="{{ asset('media/pictos/loader.gif') }}" alt="">
+						</span>
+                    </template>
+                </button>
+            </div>
+        </form>
+    </section>
+</div>

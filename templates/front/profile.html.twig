@@ -1,0 +1,38 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Votre profil
+{% endblock %}
+
+{% block body %}
+	<section class="col-span-full mt-6 lg:mt-14">
+		<h1 class="text-3xl font-medium leading-extra-loose w-full text-grey-light">
+			<span class="font-bold text-black">Modifier mon profil</span>
+		</h1>
+	</section>
+
+	{% include 'front/user/_form.user.html.twig' with { form : formUpdate, btn: {pos : 'bottom', text:'Mettre à jour'} } %}
+
+	{% form_theme formPassword 'front/forms/main.html.twig' %}
+	{{ form_start(formPassword, { attr: {'novalidate': 'novalidate', 'class' : 'col-span-4' } }) }}
+	<section class="w-full mb-6">
+		<div class="flex flex-nowrap flex-row justify-between items-center pl-5">
+			<div class="relative flex-1 py-4">
+				<div class="font-black relative flex flex-nowrap flex-row justify-start items-center w-max max-w-full cursor-pointer">
+					<h3>Changer de mot de passe</h3>
+				</div>
+			</div>
+		</div>
+	</section>
+	<section class="w-full flex flex-col justify-start items-end">
+		<div class="bg-white px-6 py-4 rounded-lg w-full">
+			<div class="flex flex-wrap flex-row items-start">
+				{{ form_row(formPassword.first, { 'row_attr' : { 'class' : 'w-full' } }) }}
+			</div>
+			<div class="flex flex-wrap flex-row items-start">
+				{{ form_row(formPassword.second, { 'row_attr' : { 'class' : 'w-full' } }) }}
+			</div>
+		</div>
+	</section>
+	<button type="submit" class="btn btn--primary mb-0 mt-8 block ml-auto mr-6">Mettre à jour</button>
+	{{ form_end(formPassword) }}
+{% endblock %}

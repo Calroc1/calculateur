@@ -1,0 +1,139 @@
+{% extends 'front/base.html.twig' %}
+
+{% import 'front/macros/list.html.twig' as LIST %}
+
+{% block title %}Campagnes{% endblock %}
+
+{% block body %}
+	<section class="col-span-full mt-6 lg:mt-14">
+		<div class="flex flex-col xl:flex-row flex-wrap justify-between items-start xl:items-end">
+			<div>
+				<h1 class="text-3xl font-regular leading-none mr-6 mb-4">Gérer mes campagnes</h1>
+{#				<div id="filters" class="flex flex-row justify-start items-end">#}
+{#					<div class="mr-7 mb-5">#}
+{#						<label for="search" class="font-medium mb-2 block">Mots clés</label>#}
+{#						<div class="filter-input relative">#}
+{#							<input type="text" placeholder="Rechercher..." name="search" id="search" title="Rechercher" class="text-xs rounded-xl bg-white font-light w-48">#}
+{#							<div class="absolute top-1/2 transform -translate-y-1/2 right-3 pointer-events-none">#}
+{#								{{ includeSVG('search.svg') }}#}
+{#							</div>#}
+{#						</div>#}
+{#					</div>#}
+{#					<div class="mr-7 mb-5">#}
+{#						<label for="campagne" class="font-medium mb-2 block">Critères spécifiques</label>#}
+{#						<div class="filter-input">#}
+{#							<select name="campagne" id="campagne" class="text-xs rounded-xl bg-white font-light w-48">#}
+{#								<option value="Cartier France">...</option>#}
+{#								<option value="Cartier France">Tantum Otem 01</option>#}
+{#								<option value="Cartier France">Tantum Otem 02</option>#}
+{#							</select>#}
+{#						</div>#}
+{#					</div>#}
+{#					<div class="mr-7 mb-5">#}
+{#						<label for="date" class="font-medium mb-2 block">Période</label>#}
+{#						<div class="flex flex-nowrap">#}
+{#							<div class="filter-input mr-2">#}
+{#								<span class="text-grey-light text-sm font-medium mr-2">de</span>#}
+{#								<input type="date" id="date" name="filter-date" class="text-xs rounded-xl bg-white font-light w-36">#}
+{#							</div>#}
+{#							<div class="filter-input">#}
+{#								<span class="text-grey-light text-sm font-medium mr-2">à</span>#}
+{#								<input type="date" id="date" name="filter-date" class="text-xs rounded-xl bg-white font-light w-36">#}
+{#							</div>#}
+{#						</div>#}
+{#					</div>#}
+{#				</div>#}
+			</div>
+			{% if is_granted('campaign_add', app.user) %}
+				<div class="xl:ml-7 mb-2 w-full xl:w-auto flex justify-end">
+					<a href="{{ path('front_campaign_add') }}" class="btn btn--primary my-0">Créer une campagne</a>
+				</div>
+			{% endif %}
+		</div>
+	</section>
+	{% set filters = {'author': 'créée par', 'dateEnd': 'date', 'statusTranslated': 'statut'} %}
+	<section class="col-span-full list list__campaigns">
+
+		{% if app.user.organism.lvl == 0 %}
+			{% for date, organism in allCampaigns %}
+				<div class="mb-5" x-cloak x-data="dropdown('{{loop.index}}')">
+					<div class="flex flex-nowrap flex-row justify-start items-center mb-5">
+						<div x-on:click="toggle" class="relative z-10 pl-7 pr-11 cursor-pointer">
+							<h2>{{date}}</h2>
+							<div class="absolute top-1/2 transition transform -translate-y-1/2 right-5 border-solid border-black-light border-2 border-t-0 border-l-0 w-3 h-3" x-bind:class="open ? 'rotate-45' : '-rotate-45'"></div>
+						</div>
+						<div class="bg-white-verydark h-px w-full"></div>
+					</div>
+					<div class="mb-2" x-cloak x-show="open">
+						{% for name, campaigns in organism %}
+							<div x-data="dropdown('{{loop.index}}')">
+								<div class="flex flex-nowrap flex-row justify-start items-center mb-2">
+									<div x-on:click="toggle" class="relative z-10 pl-5 pr-9 cursor-pointer">
+										<h3 class="transition" x-bind:class="open || 'text-grey-light'">{{name}}</h3>
+										<div class="absolute top-1/2 transition transform -translate-y-1.5 right-5 border-solid border-2 border-t-0 border-l-0 w-2 h-2" x-bind:class="open ? 'rotate-45 border-black-light' : '-rotate-45 border-grey-light'"></div>
+									</div>
+								</div>
+								<div x-show="open" class="mb-4">
+									{% set types = ['truncatedName', 'author', 'dateEnd', 'statusTranslated'] %}
+									{% set options = {
+                                        'graph': {
+											'path' : 'front_campaign_update',
+											'right' : 'campaign_update',
+											'parameters' : {
+												'step' : 'bilan'
+											}
+										},										
+										'trash' : {
+											'path' : 'front_campaign_delete',
+											'right' : 'campaign_delete',
+										},
+                                        'edit': {
+											'path' : 'front_campaign_update',
+											'right' : 'campaign_update',
+										}
+                                    } %}									
+									{{ LIST.createList(campaigns, types, options, 'state', filters) }}
+								</div>
+							</div>
+						{% endfor %}
+					</div>
+				</div>
+			{% endfor %}
+		{% elseif app.user.organism.lvl == 1 %}
+			{% for date, campaigns in allCampaigns %}
+				{% set firstItem = loop.index == 1 %}
+				<div class="mb-5" x-cloak x-data="dropdown"x-init="open = true">
+					<div class="flex flex-nowrap flex-row justify-start items-center mb-5">
+						<div x-on:click="toggle" class="relative pl-7 pr-11 cursor-pointer">
+							<h2>{{date}}</h2>
+							<div class="absolute top-1/2 transition transform -translate-y-1/2 right-5 border-solid border-black-light border-2 border-t-0 border-l-0 w-3 h-3" x-bind:class="open ? 'rotate-45' : '-rotate-45'"></div>
+						</div>
+						<div class="bg-white-verydark h-px w-full"></div>
+					</div>
+					<div class="mb-2" x-cloak x-bind:class="open || 'hidden'">
+						{% set types = ['truncatedName', 'author', 'dateEnd', 'statusTranslated'] %}
+						{% set options = {
+                            'graph': {
+								'path' : 'front_campaign_update',
+								'right' : 'campaign_update',
+								'parameters' : {
+									'step' : 'bilan'
+								}
+							},									
+							'trash' : {
+								'path' : 'front_campaign_delete',
+								'right' : 'campaign_delete',
+							},
+							'edit': {
+								'path' : 'front_campaign_update',								
+								'right' : 'campaign_update'
+							}
+                        } %}
+						{{ LIST.createList(campaigns, types, options, 'state', filters) }}
+					</div>
+				</div>
+			{% endfor %}
+		{% endif %}
+
+	</section>
+{% endblock %}

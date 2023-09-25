@@ -1,0 +1,130 @@
+{% extends 'front/base.html.twig' %}
+
+{% import 'front/macros/list.html.twig' as LIST %}
+
+{% block title %}Entreprise{% endblock %}
+
+{% block body %}
+	<section class="col-span-full w-full mt-8 xl:mt-14 xl:mb-10">
+		<div class="flex flex-wrap items-start xl:items-center justify-start xl:justify-between flex-col-reverse xl:flex-row">
+			<div class="flex items-center">
+				<h1 class="font-normal leading-extra-loose w-full text-4xl mr-8">Organisation</h1>
+{#				<form class="relative flex items-center" action="" method="post">#}
+{#					<input class="text-xs h-10 w-72 pl-6 pr-12 rounded-lg" name="search" type="text" placeholder="Rechercher un nom / prénom">#}
+{#					<button class="absolute right-0 cursor-pointer h-full w-10" type="submit">#}
+{#						<svg width="20" height="20" viewbox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">#}
+{#							<path fill-rule="evenodd" clip-rule="evenodd" d="M1.66139 2.95249C3.14722 1.08974 5.36478 0.0252686 7.73765 0.0252686C9.82221 0.0252686 11.7737 0.823598 13.2373 2.30938C15.7876 4.88179 16.2533 8.80694 14.324 11.8894L14.2353 12.0225L19.5131 17.3004C19.8014 17.6109 19.9567 17.9878 19.9567 18.4092C19.9567 18.8306 19.7792 19.2297 19.4688 19.5402C18.8922 20.1389 17.8499 20.1389 17.2733 19.5402L12.0176 14.2401L11.8846 14.3288C10.6427 15.105 9.20126 15.5264 7.73765 15.5264C5.43133 15.5264 3.23589 14.5062 1.75011 12.71C-0.534046 9.93795 -0.57838 5.74667 1.66139 2.95249ZM7.73765 13.3087C9.20126 13.3087 10.5984 12.7321 11.6406 11.6899C12.6829 10.6476 13.2595 9.25051 13.2595 7.78689C13.2595 6.32328 12.6829 4.92617 11.6406 3.88391C10.5984 2.84166 9.22343 2.26509 7.73765 2.26509C6.27403 2.26509 4.87697 2.84166 3.83467 3.88391C2.79241 4.92617 2.21584 6.30107 2.21584 7.78689C2.21584 9.25051 2.79241 10.6476 3.83467 11.6899C4.87697 12.7322 6.25187 13.3087 7.73765 13.3087Z" fill="#D3CECB"/>#}
+{#						</svg>#}
+{#					</button>#}
+{#				</form>#}
+			</div>
+			<div class="flex flex-row flex-wrap justify-end items-center w-full xl:w-auto mb-5 xl:mb-0">
+				{% if is_granted('organism_add') %}
+					<a href="{{ path('front_organism_add') }}" class="btn btn--secondary my-0 mr-7">Créer une organisation</a>
+				{% endif %}
+				{% if is_granted('user_add') %}
+					<a href="{{ path('front_user_add') }}" class="btn btn--primary my-0">Créer un collaborateur</a>
+				{% endif %}
+			</div>
+		</div>
+	</section>
+
+	<section x-data="collabList" {% if app.user.organism.lvl is defined and app.user.organism.lvl == 1 %} x-init="fetchItem(JSON.stringify({organism: {{app.user.organism.id}}}))" {% endif %} class="list list__organism col-span-full">
+
+		<div class="w-full grid grid-cols-12">
+
+			<div x-cloak x-show="active" class="section__details sticky top-12 left-0 col-span-full lg:col-span-5 lg:row-start-1 lg:col-start-8 lg:pl-8 xl:pl-12">
+				<div class="flex flex-row md:flex-row justify-between items-start mb-6 lg:mb-8 w-full border-b border-grey-light">
+					<h2 class="text-lg font-black mb-6 leading-tight">Informations</h2>
+				</div>
+
+				<template x-if="loading">
+					<img class="mx-auto my-20" src="{{asset('media/pictos/loader.gif')}}" alt="">
+				</template>
+
+				<template x-if="data && type == 'organism'">
+					<div class="item__details flex flex-col">
+						<div class="mb-5">
+							<h2 class="font-bold text-4xl leading-9 mb-2" x-text="item.name"></h2>
+{#							<p class="font-bold" x-text="count"></p>#}
+						</div>
+						<div id="details-options" class="flex mb-10 h-12"></div>
+						<div class="mb-8 p-4 bg-white rounded-lg shadow-lg">
+							<h3 class="font-black text-base mb-4 mt-2">Coordonnées</h3>
+							<ul class="grid grid-cols-2 gap-x-2 gap-y-2">
+								<template x-for="(data, id) in item.data" :key="id">
+									<li class="col-span-1 text-sm">
+										<p x-text="labels.organism[id]" class="font-black capitalize"></p>
+										<p x-text="data" class="break-words"></p>
+									</li>
+								</template>
+							</ul>
+						</div>
+					</div>
+				</template>
+
+				<template x-if="data && type == 'user'">
+					<div class="item__details flex flex-col">
+						<div class="mb-5">
+							<h2 class="font-bold text-4xl leading-9 mb-2" x-text="item.name"></h2>
+						</div>
+						<div id="details-options" class="flex mb-10 h-12"></div>
+						<div class="mb-8 p-4 bg-white rounded-lg shadow-lg">
+							<h3 class="font-black text-base mb-4 mt-2">Coordonnées</h3>
+							<ul class="grid grid-cols-2 gap-x-2 gap-y-2">
+								<template x-for="(data, id) in item.data" :key="id">
+									<li class="col-span-1 text-sm">
+										<p x-text="labels.user[id]" class="font-black capitalize"></p>
+										<p x-text="data" class="break-words"></p>
+									</li>
+								</template>
+							</ul>
+						</div>
+					</div>
+				</template>
+
+			</div>
+
+			{% set types = {'organism': ['name'], 'user' : ['__toString', 'statusTranslated']} %}
+			{% set options = {
+					'organism': {
+						'collab' : {
+							'path' : 'front_user_add', 
+							'right' : 'user_add',
+						},
+						'trash' : {
+							'path' : 'front_organism_delete', 
+							'right' : 'organism_delete',
+						},
+						'edit' : {
+							'path' : 'front_organism_update', 
+							'right' : 'organism_update',
+						}
+					}, 
+					'user': {
+						'trash' : {
+							'path' : 'front_user_delete', 
+							'right' : 'user_delete',
+						},
+						'edit' : {
+							'path' : 'front_user_update', 
+							'right' : 'user_update',
+						}
+					} 
+				}
+			%}
+			{% set filters = {
+				'organism' : {
+					'name': 'alphabétique'
+				}, 
+				'user': {
+					'statusTranslated': 'statut'
+				}
+			} %}
+			<div class="col-span-full lg:col-span-7 lg:col-start-1 lg:row-start-1">
+				{{ LIST.createList(app.user.organism, types, options, 'nested', filters) }}
+			</div>
+
+		</div>
+	</section>
+{% endblock %}

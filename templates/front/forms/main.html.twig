@@ -1,0 +1,170 @@
+{% use "form_div_layout.html.twig" %}
+
+{% block form_start -%}
+    {% set attr = attr|merge({'novalidate':'novalidate'}) %}
+    {{- parent() -}}
+{%- endblock form_start %}
+
+{%- block widget_attributes -%}
+    {% if errors|length > 0 %}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' border-2 border-red')|trim}) %}
+    {% endif %}
+    {{- parent() -}}
+{%- endblock widget_attributes -%}
+
+{%- block date_widget -%}
+    {%- set type = type|default('date') -%}
+    {{- parent() -}}
+{%- endblock date_widget -%}
+
+{%- block textarea_widget -%}
+    {% set class = 'block bg-white-dark rounded-lg text-xs font-light px-5 py-2 disabled:opacity-30 readonly:opacity-30 '  ~ block('wclass')  %}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' ' ~ class)|trim}) %}
+    {{- parent() -}}
+{%- endblock textarea_widget -%}
+
+{%- block form_widget_simple -%}    
+    {% set class = 'block bg-white-dark rounded-lg text-xs font-light h-9 disabled:opacity-30 readonly:opacity-30 ' ~ block('wclass') ~ ' ' ~ ((px is defined) ? px : 'px-5') %}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' ' ~ class)|trim}) %}
+    {{- parent() -}}
+{%- endblock form_widget_simple -%}
+
+{%- block wclass -%}
+    {% set wclass = 'w-full' %}
+    {# option "size" pour longeur de champ différente #}
+    {% if size is defined %}
+        {% if size == 'small' %}
+            {% set wclass = 'w-10' %}
+        {% elseif size == 'medium' %}
+            {% set wclass = 'w-20' %}
+        {% elseif size == 'large' %}
+            {% set wclass = 'w-40' %}
+        {% elseif size == 'very_large' %}
+            {% set wclass = 'w-60' %}
+        {% endif %}
+    {% endif %}
+    {% if w is defined %}
+        {% set wclass = w %}
+    {% endif %}
+    {{wclass}}
+{%- endblock wclass -%}
+
+{%- block choice_widget_collapsed -%}
+    {% set class = 'block bg-white-dark rounded-lg text-xs font-light px-5 h-9 disabled:opacity-30 readonly:opacity-30 ' ~ block('wclass') %}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' ' ~ class)|trim}) %}
+    {{- parent() -}}
+{%- endblock choice_widget_collapsed -%}
+
+{%- block choice_widget_expanded -%}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' flex flex-row flex-wrap justify-start items-center')|trim}) %}
+    <div {{ block('widget_container_attributes') }}>
+        {%- for child in form %}
+            {{ form_row(child) }}
+        {% endfor -%}
+    </div>
+{%- endblock choice_widget_expanded -%}
+
+{%- block checkbox_row -%}
+    <div class="input-radio">
+        {{- form_widget(form, { 'attr' : { 'class' : 'disabled:opacity-30 readonly:opacity-30' } }) -}}
+        {{- form_label(form, null) -}}
+    </div>  
+{%- endblock checkbox_row -%}
+
+{%- block checkbox_label -%}
+    {% set label_attr = label_attr|merge({'for': id}) %}
+    <label {% if label_attr %}{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}{% endif %}>{{- label -}}</label>
+{%- endblock checkbox_label -%}
+
+{%- block form_row -%}
+    {% set row_attr = row_attr|merge({class: (row_attr.class|default('') ~ ' my-2.5 mb-5')|trim}) %}
+    <div {% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %} class="">       
+        {{- form_label(form) -}}
+        {{- form_widget(form) -}} 
+        {{- form_errors(form) -}}
+    </div>
+{%- endblock form_row -%}
+
+{# LABELS #}
+{%- block form_label -%}
+    {% if lvl is defined %}
+        {% if lvl > 3 %}{% set lvl = 3 %}{% endif %}
+        {% set theblock = 'form_label_lvl' ~ lvl %} {# appel du block d'affichage du libellé en fonction du niveau d'affichage #}
+    {% endif %}
+    {% if label %}
+        {% if theblock is defined and block(theblock) is defined %}
+            {{- block(theblock) -}}
+        {% else %}
+            <div class="flex flex-row flex-nowrap justify-start items-center">
+                <h4 class="py-2.5">{{ label }}</h4>
+                {# affichage de la légende #}
+                {% if help %}
+                    <span class="cursor-pointer group ml-2.5 relative">
+                        {{ includeSVG('info-label.svg') }}
+                        <span class="absolute bg-black text-white transition transform -translate-x-1/2 pointer-events-none translate-y-0 -translate-y-2 opacity-0 group-hover:opacity-100 left-1/2 bottom-full w-52 p-1.5 text-2xs font-light">
+                            {{ help|nl2br }}
+                        </span>
+                    </span>
+                {% endif %}
+            </div>               
+        {% endif %}
+    {% endif %}
+{%- endblock form_label -%}
+
+{%- block form_label_lvl1 -%}
+    {% set label_class = label_class|default('') %}  
+    <div class="flex flex-nowrap flex-row justify-start items-center mt-6 mb-4 relative {{label_class}}" data-container="cont_{{ form.vars.id }}">
+        <div class="relative pr-7">
+            <h2 class="text-secondary">{{ label }}</h2>
+        </div>
+        {# affichage de la légende #}
+        {% if help %}
+            <div class="info-title">
+                <div class="ampule">
+                    {{ includeSVG('ampoule.svg') }}
+                </div>
+                <div class="text">{{ help|nl2br }}</div>
+            </div>
+        {% endif %}
+    </div>   
+{%- endblock form_label_lvl1 -%}
+
+{%- block form_label_lvl3 -%}
+    {% set class = "" %}
+    {% if bold is defined and bold %}
+        {% set class = class ~ " font-bold" %}
+    {% endif %}
+    {% if italic is defined and italic %}
+        {% set class = class ~ " italic" %}
+    {% endif %}
+    {% if underline is defined and underline %}
+        {% set class = class ~ " underline" %}
+    {% endif %}
+    <div class="flex flex-row flex-nowrap justify-start items-center mb-2.5">
+        <label class="text-xs {{class}}">{{ label }}</label>
+        {# affichage de la légende #}
+        {% if help %}
+            <span class="cursor-pointer group ml-2.5 relative">
+                {{ includeSVG('info-label.svg') }}
+                <span class="absolute bg-black text-white transition transform -translate-x-1/2 pointer-events-none translate-y-0 -translate-y-2 opacity-0 group-hover:opacity-100 left-1/2 bottom-full w-52 p-1.5 text-2xs font-light">
+                    {{ help|nl2br }}
+                </span>
+            </span>
+        {% endif %}
+    </div> 
+{%- endblock form_label_lvl3 -%}
+
+{%- block form_errors -%}
+    {%- if errors|length > 0 -%}
+        <ul class="w-full">
+            {%- for error in errors -%}
+                <li class="block">
+                    <div class="flex my-2 items-center bg-red text-white px-4 py-3 mt-2.5" role="alert">
+                        {{ includeSVG('info.svg') }}
+                        <p>{{ error.message }}</p>
+                    </div>
+                </li>
+            {%- endfor -%}
+        </ul>
+    {%- endif -%}
+{%- endblock form_errors -%}

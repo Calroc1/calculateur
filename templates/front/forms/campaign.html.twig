@@ -1,0 +1,261 @@
+{% use "front/forms/main.html.twig" %}
+
+{#
+    THEME DE FORMULAIRE POUR LES ETAPES DE CAMPAGNE
+    Il y a 3 niveaux d'affichages pour les éléments de formulaires, chaque niveau dispose de sa propre apparence
+    Le niveau d'affichage d'un élément sont déterminé en fonction de la variable lvl ou calculé automatiquement en fonction du niveau de son parent
+    Le niveau maximum est "3", tout les éléments de niveau >= 3 sont considérés comme étant de niveau 3
+#}
+
+{%- block number_widget -%}    
+    {% set px = 'px-2' %}
+    {% set size = size|default('medium') %}
+    {% set value = toFloat(value) %}
+    {{ block('form_widget_simple') -}}
+{%- endblock number_widget -%}
+
+{%- block text_widget -%}
+    {% set size = size|default( (form.parent.vars.field_type is defined and form.parent.vars.field_type == 'integer') ? 'medium' : 'large') %}
+    {{ block('form_widget_simple') -}}
+{%- endblock text_widget -%}
+
+{%- block choice_widget_collapsed -%}
+    {% set size = size|default('large') %}
+    {{- parent() -}}
+{%- endblock choice_widget_collapsed -%}
+
+{% macro error_label(form) %}
+    {% if form.config.options.label %}
+        <b>{{ form.config.options.label }}</b> : 
+    {% else %}
+        {{ _self.error_label(form.parent) }}
+    {% endif %}
+{% endmacro %}
+
+{%- block form_errors -%}
+    {%- if errors|length > 0 -%}
+        <ul class="w-full">
+            {%- for error in errors -%}
+                <li class="block">
+                    <div class="flex my-2 items-center bg-red text-white px-4 py-3 mt-2.5" role="alert">
+                        {{ includeSVG('info.svg') }}
+                        <p>
+                            {% if error.origin.name == 'field' and error.origin.parent.config.options.lvl > 2 %}{{ _self.error_label(error.origin.parent) }}{% endif %}
+                            {{ error.message }}
+                        </p>
+                    </div>
+                </li>
+            {%- endfor -%}
+        </ul>
+    {%- endif -%}
+{%- endblock form_errors -%}
+
+{%- block form_row -%}
+    {% set row_class = row_class|default('my-2.5 mb-5') %}
+    <div class="{{ row_class }}">       
+        {{- form_label(form) -}}
+        {% if lvl == 1 %}
+            {% set open = false %} {# pour déterminer si l'accordéon ouvert ou non #}
+            {% if demo == false %}
+                {% if form.vars.form_element.type == 'collection' %}
+                    {% set open = form.vars.data|length > 0 %}
+                {% else %}
+                    {% set open = form.vars.form_element.getDefaultValue() != form.vars.data %}
+                {% endif %}
+            {% endif %}
+            {# div pour accordéon #}
+            <div id="cont_{{ form.vars.id }}" class="accordion-container {% if open %}open{% endif %}">
+                {{- form_widget(form) -}} 
+            </div>
+        {% else %}
+            {{- form_widget(form) -}} 
+        {% endif %}
+        {{- form_errors(form) -}} 
+        {% if addendum %} {# option informations additionnelles #}
+            <i class="w-full text-xs text-grey-dark mt-1">{{ addendum }}</i>
+        {% endif %}
+    </div>
+    {% if linebreak %} {# option saut de ligne #}
+        <div class="w-full my-2"></div>
+    {% endif %}
+    {% if last is defined and last == false and lvl == 2 %} {# pour affichage d'un trait horizontale entre les éléments de niveau 2 sauf après le dernier #}
+        <hr class="w-full mt-6 text-white-verydark"/>
+    {% endif %}
+{%- endblock form_row -%}
+
+{%- block form_label_lvl1 -%}
+    {% set open = false %} {# pour déterminer l'apprence du libellé si l'accordéon ouvert ou non #}
+    {% if demo == false %}
+        {% if form.vars.form_element.type == 'collection' %}
+            {% set open = form.vars.data|length > 0 %}
+        {% else %}
+            {% set open = form.vars.form_element.getDefaultValue() != form.vars.data %}
+        {% endif %}    
+    {% endif %}
+    {% set label_class = "accordion-control" %}
+    {% if open %}
+        {% set label_class = label_class ~ " open" %}
+    {% endif %}
+    {{- parent() -}}
+{%- endblock form_label_lvl1 -%}
+
+{# SECTIONS #}
+{%- block section_row -%}
+    {% if isCollectionEntry %}
+        {{- block('section_row_entry') -}}        
+    {% else %}
+        {{ block('form_row') }}
+    {% endif %}
+{% endblock %}
+
+{%- block section_widget -%}
+    <div id="{{ form.vars.id }}" {{ block('section_attrs') }}>
+        {% for child in form.children|filter(c => c.vars.lvl is defined and c.rendered == false) %}
+            {% set child_row_class = 'my-2.5' %} 
+            {# option "display" pour affichage différent #}
+            {% if display == 'table' %} 
+                {% set child_row_class = 'mr-6' %}  
+            {% elseif display == 'inline' %} 
+                {% set child_row_class = 'mr-2' %}  
+            {% endif %}
+            {% if loop.last == true %}
+                {% set child_row_class = ' ' %}  
+                {% if display == 'default' %} 
+                    {% set child_row_class = 'my-2.5 mb-5' %}
+                {% endif %}
+            {% endif %}
+            {{- form_row(child, { 'row_class' : child_row_class }) -}}
+            {% if display == 'default' and loop.last == false and child.vars.lvl < 3 %}
+                <hr class="w-full mt-6 text-white-verydark"/>
+            {% endif %}
+        {% endfor %}
+    </div>      
+{%- endblock section_widget -%}
+
+{%- block section_attrs -%} 
+    {% if display is defined and (display == 'table' or display == 'inline') %}
+        {% set attr = attr|merge({
+            'class' : 'flex flex-row flex-wrap justify-start items-start'
+        }) %}
+    {% endif %}    
+    {% if percentage is defined and percentage %} {# option module pourcentage #}
+        {% set attr = attr|merge({
+            'data-percentage' : '1'
+        }) %}
+    {% endif %}
+    {{ block('attributes') }}
+{%- endblock section_attrs -%}
+
+{#  pour entrée de collection, on a un block spécifique :
+    - bouton de suppression de l'entrée
+    - option de renommage de l'entrée
+    - classes spécifiques pour le module js
+#}
+{%- block section_row_entry -%}    
+    <div id="{{ form.vars.id }}" class="relative border-3 border-solid border-white-dark bg-white-dark pl-10 rounded-lg rounded-tr-none w-full mb-6" data-entry="true">
+        {% if renamable %}            
+            <div class="modal modal-rename -top-1 left-0 hidden">
+                <div class="flex flex-row flex-nowrap justify-start items-stretch">
+                    <div class="rounded-lg overflow-hidden flex flex-nowrap items-stretch justify-start">                            
+                        {{ form_widget(form.children._name, { 'attr' : { 'placeholder' : "Entrez un nom", 'class' : 'repeater__input block bg-white-dark px-5 py-2.5 text-xs font-light flex-1 outline-none w-36' }}) }}
+                        <button type="button" data-entry-action="rename" class="w-9 flex justify-center items-center bg-primary transition hover:bg-secondary outline-none">
+                            {{ includeSVG('check.svg') }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <div class="absolute left-0 top-0 text-2xs font-light flex justify-center items-center w-10 h-full {% if renamable %}cursor-pointer{% endif %}" 
+            {% if renamable %}data-entry-action="toggle-rename"{% endif %} >
+            {% if renamable %}
+                <div class="icon absolute top-2 left-1/2 transform -translate-x-1/2">
+                    {{ includeSVG('pen.svg') }}
+                </div>
+            {% endif %}
+            <div class="transform -rotate-90 whitespace-nowrap max-w-none entry-label">__count__</div>
+        </div>
+        <div class="px-8 py-5 bg-white rounded-lg w-full">        
+            {{- block('section_widget') -}}
+            {{ form_errors(form) }}             
+        </div>
+        {% if form.vars.disabled == false %}
+        <div data-entry-action="remove" class="cursor-pointer bg-white-dark w-5 h-5 absolute flex justify-center items-center top-0 left-full transform translate-x-3px -translate-y-3px rounded-r">
+            {{ includeSVG('close.svg') }}
+        </div>
+        {% endif %}
+    </div>
+{%- endblock section_row_entry -%}
+
+{# FIELDS #}
+{%- block field_row -%}
+    {{ block('form_row') }}
+{%- endblock field_row -%}
+
+{%- block field_widget -%}    
+    {% if block('field_widget_' ~ field_type) is defined %} {# si un block spécifique existe selon le type de champ, alors on l'appelle #}
+        {{- block('field_widget_' ~ field_type) -}}
+    {% else %} {# sinon on appelle le block par défaut #}
+    <div>
+        </div>
+        <div {{ block('field_attrs') }}>
+            {% set field_attr = {
+                'size' : size
+            } %}
+            {{- form_widget(form.field, field_attr) -}}            
+            {% if unit %}
+                <span class="text-primary text-xs ml-2">{{ unit }}</span>
+            {% endif %}            
+        </div>
+    {% endif %}
+{%- endblock field_widget -%}
+
+{%- block widget_attributes -%}
+    {# ajout de border rouge si champ invalide #}
+    {% if form.parent.vars.valid == false %}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' border-2 border-red')|trim}) %}
+    {% endif %}
+    {{- parent() -}}
+{%- endblock widget_attributes -%}
+
+{%- block field_attrs -%}
+    {% set class = 'flex flex-row flex-nowrap justify-start items-center' %}
+    {% if lvl >= 5 %}
+        {% set class = class ~ ' mr-2.5' %}
+    {% endif %}
+    {% if field_type == 'select_with_detail' %}
+        {% set attr = attr|merge({
+            'data-select-detail' : 1,
+        }) %}
+    {% endif %}
+    {% set attr = attr|merge({
+        'class' : class
+    }) %}
+    {{ block('attributes') }}
+{%- endblock field_attrs -%}
+
+{# champ de type "collection" avec bouton d'ajout d'entrée et data attributes pour module js #}
+{%- block field_widget_collection -%}
+    <div 
+        id="{{ form.vars.id }}" 
+        {{ block('section_attrs') }} 
+        data-collection data-prototype="{{ form_row(form.field.vars.prototype)|e('html_attr') }}" 
+        data-entry-label="{{ form.vars.unit }}" 
+        data-renamable="{{ form.vars.renamable }}"
+    >
+        {% for entry in form.field.children %}
+            {{ form_row(entry) }}
+        {% endfor %}
+        {% if form.vars.disabled == false %}
+            <button type="button" class="btn btn--grey" data-entry-action="add">Ajouter {{ form.vars.unit }}</button>
+        {% endif %}
+    </div>
+{%- endblock field_widget_collection -%}
+
+{%- block choice_with_detail_widget -%}
+    <div class="flex flex-row flex-nowrap justify-start items-center">
+        {{ form_widget(form.children.choice, { 'attr' : { 'class' : 'mr-2' } }) }}
+        {% if form.children.detail is defined %}
+            {{ form_widget(form.children.detail) }}
+        {% endif %}
+    </div>        
+{%- endblock -%}
