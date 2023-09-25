@@ -11,7 +11,7 @@ Le calculateur est composé de 2 interfaces :
 
 Il est préférable de lire au préalable la partie "**Concepts importants**" ci-dessous avant de consulter les autres chapitres.
 
-1. [Installation](doc/installation)
+1. [Installation](doc/installation.md)
 2. [Configuration Frontend](doc/frontend.md)
 3. [Interface Utilisateur](doc/front.md)
 4. [Interface Administrateur](doc/back.md)
